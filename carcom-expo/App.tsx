@@ -13,6 +13,13 @@ import { CommunityDetailScreen } from './src/screens/communities/CommunityDetail
 import { TripsScreen } from './src/screens/trips/TripsScreen';
 import { CreateTripScreen } from './src/screens/trips/CreateTripScreen';
 import { TripDetailScreen } from './src/screens/trips/TripDetailScreen';
+import { TripMapScreen } from './src/screens/maps/TripMapScreen';
+import { PlaceSearchScreen } from './src/screens/maps/PlaceSearchScreen';
+import { LiveLocationScreen } from './src/screens/maps/LiveLocationScreen';
+import { ChatScreen } from './src/screens/chat/ChatScreen';
+import { PaymentsScreen } from './src/screens/payments/PaymentsScreen';
+import { ProfileScreen } from './src/screens/profile/ProfileScreen';
+import { SettingsScreen, NotificationsScreen, PrivacyScreen, ExternalServicesScreen } from './src/screens/settings/SettingsScreens';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 1000 * 60 * 5, retry: 2 } },
@@ -102,20 +109,31 @@ function MainTabs() {
   if (navStack.length > 0) {
     const current = navStack[navStack.length - 1];
     const params = navParams[current];
-    if (current === 'CreateCommunity') return <CreateCommunityScreen navigation={navigation} />;
-    if (current === 'CommunityDetail') return <CommunityDetailScreen navigation={navigation} route={{ params }} />;
-    if (current === 'CommunityChat') return <PlaceholderScreen title="Community Chat" />;
-    if (current === 'CreateTrip') return <CreateTripScreen navigation={navigation} />;
-    if (current === 'TripDetail') return <TripDetailScreen navigation={navigation} route={{ params }} />;
-    if (current === 'TripMap') return <PlaceholderScreen title="Trip Map" />;
-    return <PlaceholderScreen title={current} />;
+    switch (current) {
+      case 'CreateCommunity': return <CreateCommunityScreen navigation={navigation} />;
+      case 'CommunityDetail': return <CommunityDetailScreen navigation={navigation} route={{ params }} />;
+      case 'CommunityChat': return <ChatScreen navigation={navigation} route={{ params: { channelId: params?.id, channelType: 'community' } }} />;
+      case 'CreateTrip': return <CreateTripScreen navigation={navigation} />;
+      case 'TripDetail': return <TripDetailScreen navigation={navigation} route={{ params }} />;
+      case 'TripMap': return <TripMapScreen navigation={navigation} route={{ params }} />;
+      case 'PlaceSearch': return <PlaceSearchScreen navigation={navigation} route={{ params }} />;
+      case 'TripChat': return <ChatScreen navigation={navigation} route={{ params: { channelId: params?.id, channelType: 'trip' } }} />;
+      case 'LiveLocation': return <LiveLocationScreen navigation={navigation} route={{ params }} />;
+      case 'Payments': return <PaymentsScreen navigation={navigation} route={{ params }} />;
+      case 'Profile': return <ProfileScreen navigation={navigation} />;
+      case 'Settings': return <SettingsScreen navigation={navigation} />;
+      case 'Notifications': return <NotificationsScreen navigation={navigation} />;
+      case 'Privacy': return <PrivacyScreen navigation={navigation} />;
+      case 'ExternalServices': return <ExternalServicesScreen navigation={navigation} />;
+      default: return <PlaceholderScreen title={current} />;
+    }
   }
 
   return (
     <View style={styles.container}>
       {activeTab === 0 && <CommunitiesScreen navigation={navigation} />}
       {activeTab === 1 && <TripsScreen navigation={navigation} />}
-      {activeTab === 2 && <PlaceholderScreen title="حسابي" />}
+      {activeTab === 2 && <ProfileScreen navigation={navigation} />}
       <View style={[styles.tabBar, { backgroundColor: theme.colors.surface, borderTopColor: theme.colors.border }]}>
         {['المجتمعات', 'الرحلات', 'حسابي'].map((label, index) => (
           <TouchableOpacity key={index} onPress={() => { setActiveTab(index); setNavStack([]); }} style={styles.tabItem}>
