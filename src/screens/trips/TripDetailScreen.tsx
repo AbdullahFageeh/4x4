@@ -210,11 +210,18 @@ export function TripDetailScreen({ navigation, route }: Props) {
           </View>
         </View>
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate('TripChat', { tripId: currentTrip.id })}
-          style={[styles.chatButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-          <Text style={[styles.chatText, { color: theme.colors.primary }]}>{t('chat.tripChat')}</Text>
-        </TouchableOpacity>
+        <View style={styles.mapChatRow}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('TripMap', { tripId: currentTrip.id })}
+            style={[styles.mapButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+            <Text style={[styles.mapText, { color: theme.colors.primary }]}>🗺️ عرض الخريطة</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('TripChat', { tripId: currentTrip.id })}
+            style={[styles.chatButton, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
+            <Text style={[styles.chatText, { color: theme.colors.primary }]}>{t('chat.tripChat')}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={[styles.footer, { backgroundColor: theme.colors.background, borderTopColor: theme.colors.border }]}>
@@ -371,14 +378,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   chatButton: {
-    height: 48,
+    flex: 1,
+    height: 52,
     borderRadius: 12,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 16,
   },
   chatText: { fontSize: 16, fontWeight: '600' },
+  mapButton: {
+    flex: 1,
+    height: 52,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mapText: { fontSize: 16, fontWeight: '600' },
+  mapChatRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 16,
+  },
   footer: {
     flexDirection: 'row',
     gap: 12,

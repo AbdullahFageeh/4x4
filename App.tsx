@@ -8,7 +8,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import './src/i18n';
 import { useAppStore } from './src/store/useAppStore';
-import { lightTheme, darkTheme } from './src/theme';
 
 import { OnboardingScreen } from './src/screens/onboarding/OnboardingScreen';
 import { SignInScreen } from './src/screens/auth/SignInScreen';
@@ -22,6 +21,8 @@ import { TripsScreen } from './src/screens/trips/TripsScreen';
 import { CreateTripScreen } from './src/screens/trips/CreateTripScreen';
 import { TripDetailScreen } from './src/screens/trips/TripDetailScreen';
 import { TripChatScreen, TripPaymentsScreen } from './src/screens/trips/TripChatScreen';
+import { TripMapScreen } from './src/screens/maps/TripMapScreen';
+import { PlaceSearchScreen } from './src/screens/maps/PlaceSearchScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -64,6 +65,8 @@ function AppNavigator() {
           <Stack.Screen name="CommunityChat" component={CommunityChatScreen} />
           <Stack.Screen name="CreateTrip" component={CreateTripScreen} />
           <Stack.Screen name="TripDetail" component={TripDetailScreen} />
+          <Stack.Screen name="TripMap" component={TripMapScreen} />
+          <Stack.Screen name="PlaceSearch" component={PlaceSearchScreen} />
         </>
       )}
     </Stack.Navigator>
