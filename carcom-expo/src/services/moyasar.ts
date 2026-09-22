@@ -1,4 +1,3 @@
-import React, { useCallback, useMemo } from 'react';
 import {
   PaymentConfig,
   PaymentResult,
@@ -77,6 +76,10 @@ export function parseMoyasarResult(paymentResult: PaymentResult) {
     return { success: false, error: { type: 'unexpected', message: paymentResult.message } };
   }
   return { success: false, error: { type: 'unknown' } };
+}
+
+export function isMoyasarKeyValid(): boolean {
+  return Boolean(moyasarPublicKey && (moyasarPublicKey.startsWith('pk_test_') || moyasarPublicKey.startsWith('pk_live_')));
 }
 
 export const formatAmountForMoyasar = (amountInRiyals: number): number => {

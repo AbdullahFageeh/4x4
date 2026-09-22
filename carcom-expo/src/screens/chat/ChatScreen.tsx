@@ -49,12 +49,11 @@ export function ChatScreen({ navigation, route }: Props) {
   const handleSend = () => {
     if (!inputText.trim()) return;
     // In production, this would send via Supabase Realtime
-    console.log('Sending message:', inputText);
     setInputText('');
   };
 
-  const handleReaction = (messageId: string, emoji: string) => {
-    console.log('Reaction:', messageId, emoji);
+  const handleReaction = (_messageId: string, _emoji: string) => {
+    // In production, this would update via Supabase
   };
 
   const renderMessage = ({ item }: { item: Message }) => {

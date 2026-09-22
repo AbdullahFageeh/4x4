@@ -13,8 +13,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../../store/useAppStore';
 import { lightTheme, darkTheme } from '../../theme';
-import { createMoyasarPaymentConfig, parseMoyasarResult, PAYMENT_METHODS, formatAmountForMoyasar, moyasarPublicKey, isMoyasarTestMode } from '../../services/moyasar';
-import { PaymentConfig, PaymentStatus, CreditCardConfig, ApplePayConfig, SamsungPayConfig } from 'react-native-moyasar-sdk';
+import { createMoyasarPaymentConfig, PAYMENT_METHODS, formatAmountForMoyasar, moyasarPublicKey, isMoyasarTestMode } from '../../services/moyasar';
+import { CreditCardConfig, ApplePayConfig, SamsungPayConfig } from 'react-native-moyasar-sdk';
 
 interface Props {
   navigation: any;
@@ -58,10 +58,9 @@ export function PaymentScreen({ navigation, route }: Props) {
       });
       // In production, render the SDK components (CreditCard, ApplePay, etc.)
       // For now, we show the config object
-      console.log('PaymentConfig:', paymentConfig);
       setTimeout(() => {
         setIsProcessing(false);
-        Alert.alert('تجريبي', 'هذه نسخة تجريبية. استخدم مكونات SDK الحقيقية في الإنتاج.');
+        Alert.alert('تنبيه', 'هذه نسخة تجريبية. استخدم مكونات SDK الحقيقية في الإنتاج.');
       }, 1000);
     } catch (error: any) {
       setIsProcessing(false);
