@@ -10,6 +10,9 @@ import { lightTheme, darkTheme } from './src/theme';
 import { CommunitiesScreen } from './src/screens/communities/CommunitiesScreen';
 import { CreateCommunityScreen } from './src/screens/communities/CreateCommunityScreen';
 import { CommunityDetailScreen } from './src/screens/communities/CommunityDetailScreen';
+import { TripsScreen } from './src/screens/trips/TripsScreen';
+import { CreateTripScreen } from './src/screens/trips/CreateTripScreen';
+import { TripDetailScreen } from './src/screens/trips/TripDetailScreen';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 1000 * 60 * 5, retry: 2 } },
@@ -96,20 +99,22 @@ function MainTabs() {
 
   const navigation = { navigate, goBack };
 
-  // Render current screen from nav stack
   if (navStack.length > 0) {
     const current = navStack[navStack.length - 1];
     const params = navParams[current];
     if (current === 'CreateCommunity') return <CreateCommunityScreen navigation={navigation} />;
     if (current === 'CommunityDetail') return <CommunityDetailScreen navigation={navigation} route={{ params }} />;
     if (current === 'CommunityChat') return <PlaceholderScreen title="Community Chat" />;
+    if (current === 'CreateTrip') return <CreateTripScreen navigation={navigation} />;
+    if (current === 'TripDetail') return <TripDetailScreen navigation={navigation} route={{ params }} />;
+    if (current === 'TripMap') return <PlaceholderScreen title="Trip Map" />;
     return <PlaceholderScreen title={current} />;
   }
 
   return (
     <View style={styles.container}>
       {activeTab === 0 && <CommunitiesScreen navigation={navigation} />}
-      {activeTab === 1 && <PlaceholderScreen title="الرحلات" />}
+      {activeTab === 1 && <TripsScreen navigation={navigation} />}
       {activeTab === 2 && <PlaceholderScreen title="حسابي" />}
       <View style={[styles.tabBar, { backgroundColor: theme.colors.surface, borderTopColor: theme.colors.border }]}>
         {['المجتمعات', 'الرحلات', 'حسابي'].map((label, index) => (
