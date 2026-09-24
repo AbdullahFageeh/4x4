@@ -87,6 +87,23 @@ jest.mock('react-native-maps', () => {
   };
 });
 
+jest.mock('react-native-moyasar-sdk', () => {
+  const React = require('react');
+  return {
+    __esModule: true,
+    PaymentConfig: class { constructor() {} },
+    PaymentResponse: class { status = 'paid'; },
+    PaymentStatus: { paid: 'paid', failed: 'failed' },
+    CreditCardConfig: class { constructor() {} },
+    ApplePayConfig: class { constructor() {} },
+    SamsungPayConfig: class { constructor() {} },
+    CreditCard: () => React.createElement('div'),
+    ApplePay: () => React.createElement('div'),
+    StcPay: () => React.createElement('div'),
+    SamsungPay: () => React.createElement('div'),
+  };
+});
+
 import App from '../App';
 
 test('App component loads without crashing', () => {
