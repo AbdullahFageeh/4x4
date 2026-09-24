@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import MapView, { Marker } from 'react-native-maps';
 import {
   View,
   Text,
@@ -9,6 +10,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../../store/useAppStore';
 import { lightTheme, darkTheme } from '../../theme';
+import { googleMapsService } from '../../services/googleMaps';
 
 interface Props {
   navigation: any;
@@ -98,26 +100,38 @@ export function LiveLocationScreen({ navigation }: Props) {
         <View style={{ width: 32 }} />
       </View>
 
-      {/* Map placeholder */}
+      {/* Map */}
       <View style={[styles.mapContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-        <View style={styles.mapPlaceholder}>
-          <Text style={{ fontSize: 48 }}>📍</Text>
-          <Text style={[styles.mapPlaceholderTitle, { color: theme.colors.text }]}>خريطة الموقع المباشر</Text>
-          <Text style={[styles.mapPlaceholderText, { color: theme.colors.textMuted }]}>
-            Google Maps — يتطلب مفتاح API
-          </Text>
-        </View>
-        {/* Participant markers */}
-        <View style={styles.markersOverlay}>
-          {participants
-            .filter((p) => p.isSharing)
-            .map((p) => (
-              <View key={p.id} style={[styles.participantMarker, { backgroundColor: p.isStale ? theme.colors.warning : theme.colors.success }]}>
-                <Text style={{ color: '#fff', fontSize: 10 }}>🚗</Text>
-                <Text style={[styles.markerLabel, { color: '#fff' }]}>{p.name}</Text>
-              </View>
-            ))}
-        </View>
+        {googleMapsService.isConfigured ? (
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: 28.4,
+              longitude: 36.5,
+              latitudeDelta: 0.5,
+              longitudeDelta: 0.5,
+            }}
+          >
+            {participants
+              .filter((p) => p.isSharing)
+              .map((p) => (
+                <Marker
+                  key={p.id}
+                  coordinate={{ latitude: p.lat, longitude: p.lng }}
+                  title={p.name}
+                  pinColor={p.isStale ? '#FFA000' : '#4CAF50'}
+                />
+              ))}
+          </MapView>
+        ) : (
+          <View style={styles.mapPlaceholder}>
+            <Text style={{ fontSize: 48 }}>📍</Text>
+            <Text style={[styles.mapPlaceholderTitle, { color: theme.colors.text }]}>خريطة الموقع المباشر</Text>
+            <Text style={[styles.mapPlaceholderText, { color: theme.colors.textMuted }]}>
+              Google Maps — يتطلب مفتاح API
+            </Text>
+          </View>
+        )}
       </View>
 
       {/* Controls */}
@@ -233,6 +247,7 @@ const styles = StyleSheet.create({
   backButton: { fontSize: 24 },
   title: { fontSize: 20, fontWeight: '600' },
   mapContainer: { height: 200, borderBottomWidth: 1, position: 'relative' },
+  map: { width: '100%', height: '100%'},
   mapPlaceholder: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   mapPlaceholderTitle: { fontSize: 18, fontWeight: '600', marginTop: 8 },
   mapPlaceholderText: { fontSize: 14, marginTop: 4 },

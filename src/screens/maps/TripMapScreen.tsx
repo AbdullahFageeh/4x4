@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import MapView, { Marker } from 'react-native-maps';
 import {
   View,
   Text,
@@ -11,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppStore } from '../../store/useAppStore';
 import { useTripStore } from '../../store/tripStore';
 import { lightTheme, darkTheme } from '../../theme';
+import { googleMapsService } from '../../services/googleMaps';
 interface Props {
   navigation: any;
   route: any;
@@ -48,26 +50,53 @@ export function TripMapScreen({ navigation, route }: Props) {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={[styles.mapContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
-        <View style={styles.mapPlaceholder}>
-          <Text style={{ fontSize: 48 }}>🗺️</Text>
-          <Text style={[styles.mapPlaceholderTitle, { color: theme.colors.text }]}>خريطة الرحلة</Text>
-          <Text style={[styles.mapPlaceholderText, { color: theme.colors.textMuted }]}>
-            Google Maps — يتطلب مفتاح API
-          </Text>
-          <Text style={[styles.mapPlaceholderSubtext, { color: theme.colors.textMuted }]}>
-            {currentTrip.destination.name}
-          </Text>
-        </View>
-        <View style={styles.markersOverlay}>
-          <View style={[styles.marker, { backgroundColor: theme.colors.primary }]}>
-            <Text style={[styles.markerText, { color: theme.colors.onPrimary }]}>📍</Text>
-            <Text style={[styles.markerLabel, { color: theme.colors.onPrimary }]}>{t('trip.meetingPoint')}</Text>
+        {googleMapsService.isConfigured ? (
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: currentTrip.meeting_point.lat,
+              longitude: currentTrip.meeting_point.lng,
+              latitudeDelta: 0.5,
+              longitudeDelta: 0.5,
+            }}
+          >
+            <Marker
+              coordinate={{
+                latitude: currentTrip.meeting_point.lat,
+                longitude: currentTrip.meeting_point.lng,
+              }}
+              title={t('trip.meetingPoint')}
+              pinColor={theme.colors.primary}
+            />
+            <Marker
+              coordinate={{
+                latitude: currentTrip.destination.lat,
+                longitude: currentTrip.destination.lng,
+              }}
+              title={t('trip.destination')}
+              pinColor={theme.colors.accent}
+            />
+            {currentTrip.route_stops.map((stop, index) => (
+              <Marker
+                key={index}
+                coordinate={{ latitude: stop.lat, longitude: stop.lng }}
+                title={stop.name}
+                pinColor={theme.colors.warning}
+              />
+            ))}
+          </MapView>
+        ) : (
+          <View style={styles.mapPlaceholder}>
+            <Text style={{ fontSize: 48 }}>🗺️</Text>
+            <Text style={[styles.mapPlaceholderTitle, { color: theme.colors.text }]}>خريطة الرحلة</Text>
+            <Text style={[styles.mapPlaceholderText, { color: theme.colors.textMuted }]}>
+              Google Maps — يتطلب مفتاح API
+            </Text>
+            <Text style={[styles.mapPlaceholderSubtext, { color: theme.colors.textMuted }]}>
+              {currentTrip.destination.name}
+            </Text>
           </View>
-          <View style={[styles.marker, { backgroundColor: theme.colors.accent }]}>
-            <Text style={[styles.markerText, { color: '#fff' }]}>🏁</Text>
-            <Text style={[styles.markerLabel, { color: '#fff' }]}>{t('trip.destination')}</Text>
-          </View>
-        </View>
+        )}
       </View>
 
       <ScrollView style={styles.infoContainer}>
@@ -157,6 +186,7 @@ const styles = StyleSheet.create({
   loadingText: { marginTop: 16 },
   errorText: { fontSize: 16, marginTop: 16 },
   mapContainer: { height: 250, borderBottomWidth: 1, position: 'relative' },
+  map: { width: '100%', height: '100%'},
   mapPlaceholder: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   mapPlaceholderTitle: { fontSize: 18, fontWeight: '600', marginTop: 8 },
   mapPlaceholderText: { fontSize: 14, marginTop: 4 },

@@ -77,6 +77,16 @@ jest.mock('../src/i18n', () => ({
   default: {},
 }));
 
+jest.mock('react-native-maps', () => {
+  const React = require('react');
+  return {
+    __esModule: true,
+    default: ({ children }: { children: React.ReactNode }) => React.createElement('div', {}, children),
+    Marker: () => null,
+    Polyline: () => null,
+  };
+});
+
 import App from '../App';
 
 test('App component loads without crashing', () => {
