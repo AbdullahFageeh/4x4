@@ -21,14 +21,14 @@ export function TripMapScreen({ navigation, route }: Props) {
   const { isDark } = useAppStore();
   const theme = isDark ? darkTheme : lightTheme;
   const { tripId } = route.params;
-  const { currentTrip, isLoading, fetchTrip } = useTripStore();
+  const { currentTrip, ops, fetchTrip } = useTripStore();
   const [showDirections, setShowDirections] = useState(false);
 
   useEffect(() => {
     fetchTrip(tripId);
   }, [tripId]);
 
-  if (isLoading && !currentTrip) {
+  if (ops.fetchStatus === 'loading' && !currentTrip) {
     return (
       <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
         <ActivityIndicator size="large" color={theme.colors.primary} />

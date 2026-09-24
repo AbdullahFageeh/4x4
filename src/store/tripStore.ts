@@ -1,54 +1,69 @@
 import { create } from 'zustand';
-import { Trip, TripParticipant, CreateTripInput, TripFilter } from '../types/trip';
-import { DEMO_TRIPS } from '../services/demoData';
+import { Trip, TripParticipant, CreateTripInput, TripFilter, TripOperationState, TripValidationError } from '../types/trip';
+import { DEMO_TRIPS, DEMO_PARTICIPANTS, resetDemoData } from '../services/demoData';
 import { useAppStore } from './useAppStore';
 
 interface TripState {
   trips: Trip[];
   currentTrip: Trip | null;
   participants: TripParticipant[];
-  isLoading: boolean;
-  error: string | null;
   userTrips: string[];
+  ops: TripOperationState;
 
   fetchTrips: (filter?: TripFilter) => Promise<void>;
   fetchTrip: (id: string) => Promise<void>;
   createTrip: (input: CreateTripInput) => Promise<Trip | null>;
-  joinTrip: (tripId: string) => Promise<void>;
-  declineTrip: (tripId: string) => Promise<void>;
-  cancelTrip: (tripId: string) => Promise<void>;
-  shareLocation: (tripId: string, lat: number, lng: number) => Promise<void>;
+  joinTrip: (tripId: string) => Promise<{ ok: boolean; error?: string }>;
+  leaveTrip: (tripId: string) => Promise<{ ok: boolean; error?: string }>;
+  declineTrip: (tripId: string) => Promise<{ ok: boolean; error?: string }>;
+  cancelTrip: (tripId: string) => Promise<{ ok: boolean; error?: string }>;
+  shareLocation: (tripId: string, lat: number, lng: number) => Promise<{ ok: boolean; error?: string }>;
+  stopSharingLocation: (tripId: string) => Promise<void>;
   fetchParticipants: (tripId: string) => Promise<void>;
   getUserTrips: () => Promise<void>;
+  resetStore: () => void;
   clearError: () => void;
 }
 
-const DEMO_PARTICIPANTS: TripParticipant[] = [
-  { trip_id: 'trip-001', user_id: 'user-001', status: 'going', joined_at: '2026-09-15T10:00:00Z' },
-  { trip_id: 'trip-001', user_id: 'user-002', status: 'going', joined_at: '2026-09-16T10:00:00Z' },
-  { trip_id: 'trip-001', user_id: 'user-003', status: 'waitlisted', joined_at: '2026-09-18T10:00:00Z' },
-  { trip_id: 'trip-002', user_id: 'user-001', status: 'going', joined_at: '2026-09-18T10:00:00Z' },
-  { trip_id: 'trip-003', user_id: 'user-004', status: 'going', joined_at: '2026-09-20T10:00:00Z' },
-];
+const initialOps: TripOperationState = {
+  fetchStatus: 'idle',
+  createStatus: 'idle',
+  joinStatus: 'idle',
+  declineStatus: 'idle',
+  cancelStatus: 'idle',
+  participantsStatus: 'idle',
+  locationStatus: 'idle',
+};
 
-export const useTripStore = create<TripState>((set) => ({
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+// Domain validation helpers
+function validateTripAction(trip: Trip | undefined, action: 'join' | 'leave' | 'decline' | 'cancel', userId: string): TripValidationError | null {
+  if (!trip) return { code: 'TRIP_CANCELLED', message: 'Trip not found' };
+  if (trip.status === 'cancelled' && action !== 'join' && action !== 'cancel') return { code: 'TRIP_CANCELLED', message: 'Trip has been cancelled' };
+  if (trip.status === 'completed') return { code: 'TRIP_COMPLETED', message: 'Trip has already completed' };
+  if (action === 'cancel' && trip.created_by !== userId) return { code: 'NOT_ORGANIZER', message: 'Only the organizer can cancel this trip' };
+  if (action === 'join' && trip.current_participants >= trip.participant_limit) return { code: 'TRIP_FULL', message: 'This trip is full' };
+  return null;
+}
+
+export const useTripStore = create<TripState>((set, get) => ({
   trips: [],
   currentTrip: null,
   participants: [],
-  isLoading: false,
-  error: null,
   userTrips: [],
+  ops: { ...initialOps },
 
   fetchTrips: async (filter?: TripFilter) => {
-    set({ isLoading: true, error: null });
+    set((s) => ({ ops: { ...s.ops, fetchStatus: 'loading' } }));
     try {
-      await new Promise((r) => setTimeout(r, 400));
+      await delay(400);
       let result = [...DEMO_TRIPS].filter((t) => t.status === 'published');
 
       if (filter?.search) {
-        const s = filter.search.toLowerCase();
+        const search = filter.search.toLowerCase();
         result = result.filter(
-          (t) => t.title.toLowerCase().includes(s) || t.description.toLowerCase().includes(s)
+          (t) => t.title.toLowerCase().includes(search) || t.description.toLowerCase().includes(search)
         );
       }
       if (filter?.category) {
@@ -59,20 +74,20 @@ export const useTripStore = create<TripState>((set) => ({
       }
 
       result.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      set({ trips: result, isLoading: false });
+      set((s) => ({ trips: result, ops: { ...s.ops, fetchStatus: 'idle' } }));
     } catch {
-      set({ error: 'Failed to load trips', isLoading: false });
+      set((s) => ({ ops: { ...s.ops, fetchStatus: 'error' } }));
     }
   },
 
   fetchTrip: async (id: string) => {
-    set({ isLoading: true, error: null });
+    set((s) => ({ ops: { ...s.ops, fetchStatus: 'loading' } }));
     try {
-      await new Promise((r) => setTimeout(r, 300));
+      await delay(300);
       const trip = DEMO_TRIPS.find((t) => t.id === id) || null;
-      set({ currentTrip: trip, isLoading: false });
+      set((s) => ({ currentTrip: trip, ops: { ...s.ops, fetchStatus: 'idle' } }));
     } catch {
-      set({ error: 'Failed to load trip', isLoading: false });
+      set((s) => ({ ops: { ...s.ops, fetchStatus: 'error' } }));
     }
   },
 
@@ -80,9 +95,9 @@ export const useTripStore = create<TripState>((set) => ({
     const { user } = useAppStore.getState();
     if (!user) return null;
 
-    set({ isLoading: true, error: null });
+    set((s) => ({ ops: { ...s.ops, createStatus: 'loading' } }));
     try {
-      await new Promise((r) => setTimeout(r, 600));
+      await delay(600);
       const newTrip: Trip = {
         id: `trip-${Date.now()}`,
         community_id: input.community_id,
@@ -107,106 +122,201 @@ export const useTripStore = create<TripState>((set) => ({
         updated_at: new Date().toISOString(),
       };
 
-      set((state) => ({
-        trips: [newTrip, ...state.trips],
-        userTrips: [...state.userTrips, newTrip.id],
-        isLoading: false,
+      DEMO_TRIPS.unshift(newTrip);
+      DEMO_PARTICIPANTS.push({ trip_id: newTrip.id, user_id: user.id, status: 'going', joined_at: new Date().toISOString() });
+
+      set((s) => ({
+        trips: [newTrip, ...s.trips],
+        userTrips: [...s.userTrips, newTrip.id],
+        ops: { ...s.ops, createStatus: 'idle' },
       }));
       return newTrip;
     } catch {
-      set({ error: 'Failed to create trip', isLoading: false });
+      set((s) => ({ ops: { ...s.ops, createStatus: 'error' } }));
       return null;
     }
   },
 
   joinTrip: async (tripId: string) => {
     const { user } = useAppStore.getState();
-    if (!user) return;
+    if (!user) return { ok: false, error: 'not_authenticated' };
 
-    set({ isLoading: true, error: null });
+    // Idempotency
+    const { userTrips } = get();
+    if (userTrips.includes(tripId)) return { ok: true };
+
+    const trip = DEMO_TRIPS.find((t) => t.id === tripId);
+    const validationError = validateTripAction(trip, 'join', user.id);
+    if (validationError) return { ok: false, error: validationError.code };
+
+    set((s) => ({ ops: { ...s.ops, joinStatus: 'loading' } }));
     try {
-      await new Promise((r) => setTimeout(r, 500));
-      const trip = DEMO_TRIPS.find((t) => t.id === tripId);
-      const isFull = trip ? trip.current_participants >= trip.participant_limit : false;
+      await delay(500);
+      // Update participant count
+      const idx = DEMO_TRIPS.findIndex((t) => t.id === tripId);
+      if (idx >= 0) {
+        DEMO_TRIPS[idx] = { ...DEMO_TRIPS[idx], current_participants: DEMO_TRIPS[idx].current_participants + 1 };
+      }
+      DEMO_PARTICIPANTS.push({ trip_id: tripId, user_id: user.id, status: 'going', joined_at: new Date().toISOString() });
 
-      set((state) => ({
-        userTrips: isFull ? state.userTrips : [...state.userTrips, tripId],
-        isLoading: false,
-      }));
+      set((s) => {
+        const updatedTrip = idx >= 0 ? DEMO_TRIPS[idx] : null;
+        return {
+          userTrips: [...s.userTrips, tripId],
+          trips: s.trips.map((t) => (t.id === tripId ? updatedTrip! : t)),
+          currentTrip: s.currentTrip?.id === tripId ? updatedTrip : s.currentTrip,
+          ops: { ...s.ops, joinStatus: 'success' },
+        };
+      });
+      return { ok: true };
     } catch {
-      set({ error: 'Failed to join trip', isLoading: false });
+      set((s) => ({ ops: { ...s.ops, joinStatus: 'error' } }));
+      return { ok: false, error: 'join_failed' };
+    }
+  },
+
+  leaveTrip: async (tripId: string) => {
+    const { user } = useAppStore.getState();
+    if (!user) return { ok: false, error: 'not_authenticated' };
+
+    // Idempotency
+    const { userTrips } = get();
+    if (!userTrips.includes(tripId)) return { ok: true };
+
+    const trip = DEMO_TRIPS.find((t) => t.id === tripId);
+    if (!trip || trip.created_by === user.id) {
+      return { ok: false, error: 'organizer cannot leave — cancel instead' };
+    }
+
+    set((s) => ({ ops: { ...s.ops, joinStatus: 'loading' } }));
+    try {
+      await delay(300);
+      const idx = DEMO_TRIPS.findIndex((t) => t.id === tripId);
+      if (idx >= 0) {
+        DEMO_TRIPS[idx] = { ...DEMO_TRIPS[idx], current_participants: Math.max(0, DEMO_TRIPS[idx].current_participants - 1) };
+      }
+      const pIdx = DEMO_PARTICIPANTS.findIndex((p) => p.trip_id === tripId && p.user_id === user.id);
+      if (pIdx >= 0) DEMO_PARTICIPANTS.splice(pIdx, 1);
+
+      set((s) => ({
+        userTrips: s.userTrips.filter((id) => id !== tripId),
+        trips: s.trips.map((t) => (t.id === tripId ? { ...t, current_participants: Math.max(0, t.current_participants - 1) } : t)),
+        ops: { ...s.ops, joinStatus: 'success' },
+      }));
+      return { ok: true };
+    } catch {
+      set((s) => ({ ops: { ...s.ops, joinStatus: 'error' } }));
+      return { ok: false, error: 'leave_failed' };
     }
   },
 
   declineTrip: async (tripId: string) => {
-    set({ isLoading: true, error: null });
+    const { user } = useAppStore.getState();
+    if (!user) return { ok: false, error: 'not_authenticated' };
+
+    // Idempotency
+    const { userTrips } = get();
+    if (!userTrips.includes(tripId)) return { ok: true };
+
+    set((s) => ({ ops: { ...s.ops, declineStatus: 'loading' } }));
     try {
-      await new Promise((r) => setTimeout(r, 300));
-      set((state) => ({
-        userTrips: state.userTrips.filter((id) => id !== tripId),
-        isLoading: false,
+      await delay(300);
+      set((s) => ({
+        userTrips: s.userTrips.filter((id) => id !== tripId),
+        ops: { ...s.ops, declineStatus: 'success' },
       }));
+      return { ok: true };
     } catch {
-      set({ error: 'Failed to decline trip', isLoading: false });
+      set((s) => ({ ops: { ...s.ops, declineStatus: 'error' } }));
+      return { ok: false, error: 'decline_failed' };
     }
   },
 
   cancelTrip: async (tripId: string) => {
     const { user } = useAppStore.getState();
-    if (!user) return;
+    if (!user) return { ok: false, error: 'not_authenticated' };
 
-    set({ isLoading: true, error: null });
+    // Idempotency
+    const { trips } = get();
+    const existingTrip = trips.find((t) => t.id === tripId);
+    if (existingTrip?.status === 'cancelled') return { ok: true };
+
+    const trip = DEMO_TRIPS.find((t) => t.id === tripId);
+    const validationError = validateTripAction(trip, 'cancel', user.id);
+    if (validationError) return { ok: false, error: validationError.code };
+
+    set((s) => ({ ops: { ...s.ops, cancelStatus: 'loading' } }));
     try {
-      await new Promise((r) => setTimeout(r, 300));
-      set((state) => ({
-        trips: state.trips.map((trip) =>
-          trip.id === tripId ? { ...trip, status: 'cancelled' } : trip
-        ),
-        currentTrip:
-          state.currentTrip?.id === tripId
-            ? { ...state.currentTrip, status: 'cancelled' }
-            : state.currentTrip,
-        userTrips: state.userTrips.filter((id) => id !== tripId),
-        isLoading: false,
+      await delay(300);
+      const idx = DEMO_TRIPS.findIndex((t) => t.id === tripId);
+      if (idx >= 0) {
+        DEMO_TRIPS[idx] = { ...DEMO_TRIPS[idx], status: 'cancelled', updated_at: new Date().toISOString() };
+      }
+
+      set((s) => ({
+        trips: s.trips.map((t) => (t.id === tripId ? { ...t, status: 'cancelled' as const } : t)),
+        currentTrip: s.currentTrip?.id === tripId ? { ...s.currentTrip, status: 'cancelled' as const } : s.currentTrip,
+        userTrips: s.userTrips.filter((id) => id !== tripId),
+        ops: { ...s.ops, cancelStatus: 'success' },
       }));
+      return { ok: true };
     } catch {
-      set({ error: 'Failed to cancel trip', isLoading: false });
+      set((s) => ({ ops: { ...s.ops, cancelStatus: 'error' } }));
+      return { ok: false, error: 'cancel_failed' };
     }
   },
 
   shareLocation: async (_tripId: string, _lat: number, _lng: number) => {
     const { user } = useAppStore.getState();
-    if (!user) return;
+    if (!user) return { ok: false, error: 'not_authenticated' };
 
-    set({ isLoading: true, error: null });
+    set((s) => ({ ops: { ...s.ops, locationStatus: 'sharing' } }));
     try {
-      await new Promise((r) => setTimeout(r, 300));
-      set({ isLoading: false });
+      await delay(300);
+      // In demo mode, just track that sharing is active
+      set((s) => ({ ops: { ...s.ops, locationStatus: 'sharing' } }));
+      return { ok: true };
     } catch {
-      set({ error: 'Failed to share location', isLoading: false });
+      set((s) => ({ ops: { ...s.ops, locationStatus: 'error' } }));
+      return { ok: false, error: 'location_failed' };
     }
   },
 
+  stopSharingLocation: async (_tripId: string) => {
+    set((s) => ({ ops: { ...s.ops, locationStatus: 'stopped' } }));
+  },
+
   fetchParticipants: async (tripId: string) => {
-    set({ isLoading: true, error: null });
+    set((s) => ({ ops: { ...s.ops, participantsStatus: 'loading' } }));
     try {
-      await new Promise((r) => setTimeout(r, 300));
-      const participants = DEMO_PARTICIPANTS.filter((p) => p.trip_id === tripId);
-      set({ participants, isLoading: false });
+      await delay(300);
+      const participants = DEMO_PARTICIPANTS.filter((p) => p.trip_id === tripId) as TripParticipant[];
+      set((s) => ({ participants, ops: { ...s.ops, participantsStatus: 'idle' } }));
     } catch {
-      set({ error: 'Failed to load participants', isLoading: false });
+      set((s) => ({ ops: { ...s.ops, participantsStatus: 'error' } }));
     }
   },
 
   getUserTrips: async () => {
-    set({ isLoading: true, error: null });
+    set((s) => ({ ops: { ...s.ops, fetchStatus: 'loading' } }));
     try {
-      await new Promise((r) => setTimeout(r, 300));
-      set({ userTrips: ['trip-001', 'trip-002'], isLoading: false });
+      await delay(300);
+      set({ userTrips: ['trip-001', 'trip-002'], ops: { ...get().ops, fetchStatus: 'idle' } });
     } catch {
-      set({ error: 'Failed to load your trips', isLoading: false });
+      set((s) => ({ ops: { ...s.ops, fetchStatus: 'error' } }));
     }
   },
 
-  clearError: () => set({ error: null }),
+  resetStore: () => {
+    resetDemoData();
+    set({
+      trips: [],
+      currentTrip: null,
+      participants: [],
+      userTrips: [],
+      ops: { ...initialOps },
+    });
+  },
+
+  clearError: () => set({ ops: { ...initialOps } }),
 }));

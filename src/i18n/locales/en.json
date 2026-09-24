@@ -1,6 +1,8 @@
 {
   "onboarding": {
     "title": "Welcome to CarCom",
+    "demo": "Demo Mode",
+    "comingSoon": "Coming Soon",
     "subtitle": "Find your car crew, plan trips, and share the road.",
     "description": "A community for car enthusiasts in Saudi Arabia. Join your favorite car community, plan trips, share expenses.",
     "getStarted": "Get Started",
@@ -106,6 +108,7 @@
     "participants": "Participants",
     "cost": "Cost",
     "join": "Join",
+    "leave": "Leave",
     "decline": "Decline",
     "waitlist": "Waitlist",
     "full": "Full",

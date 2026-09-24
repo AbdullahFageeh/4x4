@@ -19,7 +19,7 @@ export function TripDetailScreen({ navigation, route }: Props) {
   const {
     currentTrip,
     participants,
-    isLoading,
+    ops,
     fetchTrip,
     fetchParticipants,
     joinTrip,
@@ -36,7 +36,7 @@ export function TripDetailScreen({ navigation, route }: Props) {
     fetchParticipants(tripId);
   };
 
-  if (isLoading && !currentTrip) {
+  if (ops.fetchStatus === 'loading' && !currentTrip) {
     return (
       <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
         <ActivityIndicator size="large" color={theme.colors.primary} />

@@ -1,7 +1,9 @@
 {
   "onboarding": {
     "title": "مرحباً بك في كار كوم",
-    "subtitle": "Find your car crew, plan trips, and share the road.",
+    "demo": "وضع التجربة",
+    "comingSoon": "قريباً",
+    "subtitle": "اعثر على مجموعتك، خطط للرحلات، وشارك الطريق.",
     "description": "مجتمع لمحبي السيارات في السعودية. انضم لمجتمع سياراتك المفضلة، خطط للرحلات، شارك المصاريف.",
     "getStarted": "ابدأ الآن",
     "login": "تسجيل الدخول",
@@ -106,6 +108,7 @@
     "participants": "المشاركون",
     "cost": "التكلفة",
     "join": "انضمام",
+    "leave": "مغادرة",
     "decline": "رفض",
     "waitlist": "قائمة الانتظار",
     "full": "مكتملة",

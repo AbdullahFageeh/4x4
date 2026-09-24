@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import './src/i18n';
 import { useAppStore } from './src/store/useAppStore';
@@ -27,13 +28,15 @@ const queryClient = new QueryClient({
 });
 
 function PlaceholderScreen({ title }: { title: string }) {
+  const { t } = useTranslation();
   const { isDark } = useAppStore();
   const theme = isDark ? darkTheme : lightTheme;
   return (
     <ScrollView style={[styles.center, { backgroundColor: theme.colors.background }]}>
       <Text style={{ fontSize: 64 }}>🚧</Text>
       <Text style={[styles.title, { color: theme.colors.text }]}>{title}</Text>
-      <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>قيد التطوير</Text>
+      <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>{t('onboarding.comingSoon')}</Text>
+      <Text style={[styles.demoLabel, { color: theme.colors.warning }]}>🎬 {t('onboarding.demo')}</Text>
     </ScrollView>
   );
 }

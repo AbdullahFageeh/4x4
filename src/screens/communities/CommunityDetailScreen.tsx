@@ -25,7 +25,7 @@ export function CommunityDetailScreen({ navigation, route }: Props) {
   const {
     currentCommunity,
     members,
-    isLoading,
+    ops,
     fetchCommunity,
     fetchMembers,
     joinCommunity,
@@ -52,7 +52,7 @@ export function CommunityDetailScreen({ navigation, route }: Props) {
     fetchMembers(communityId);
   };
 
-  if (isLoading && !currentCommunity) {
+  if (ops.fetchStatus === 'loading' && !currentCommunity) {
     return (
       <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
         <ActivityIndicator size="large" color={theme.colors.primary} />

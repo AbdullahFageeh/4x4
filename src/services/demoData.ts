@@ -1,14 +1,15 @@
 import { Community } from '../types/community';
 import { Trip } from '../types/trip';
 
-export const DEMO_COMMUNITIES: Community[] = [
+// Initial snapshots used for reset — stored once at module load
+const INITIAL_COMMUNITIES: Community[] = [
   {
     id: 'comm-001', name: 'LC Club KSA',
     description: 'مجتمع ملاك تويوتا لاند كروزر في السعودية. نخطط رحلات برية وسياحية بشكل دوري.',
     car_model: 'Toyota Land Cruiser',
     cover_image_url: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800',
     visibility: 'public', invite_code: 'LC-KSA-2026',
-    rules: '• الاحترام المتبادل بين الأعضاء\n• الالتزام بالمواعيد في الرحلات\n• عدم نشر محتوى غير لائق\n• الالتزام بقيادة آمنة',
+    rules: '• الاحترام المتبادل بين الأعضاء\ن• الالتزام بالمواعيد في الرحلات\n• عدم نشر محتوى غير لائق\n• الالتزام بقيادة آمنة',
     member_count: 234, created_by: 'demo-user', created_at: '2026-01-15T10:00:00Z', updated_at: '2026-09-20T15:30:00Z',
   },
   {
@@ -58,7 +59,7 @@ export const DEMO_COMMUNITIES: Community[] = [
   },
 ];
 
-export const DEMO_TRIPS: Trip[] = [
+const INITIAL_TRIPS: Trip[] = [
   {
     id: 'trip-001', community_id: 'comm-001', title: 'رحلة وادي ديسي',
     description: 'رحلة برية في وادي ديسي تبوك. تطعيس وتخييم تحت النجوم.',
@@ -125,4 +126,23 @@ export const DEMO_TRIPS: Trip[] = [
     created_by: 'user-001', created_at: '2026-09-10T10:00:00Z', updated_at: '2026-09-21T14:00:00Z',
     community: { id: 'comm-003', name: 'يوتا أوف رود', car_model: 'Jeep Wrangler' },
   },
+];
+
+// Mutable copies — stores and services operate on these, never the snapshots
+export const DEMO_COMMUNITIES: Community[] = [...INITIAL_COMMUNITIES];
+export const DEMO_TRIPS: Trip[] = [...INITIAL_TRIPS];
+
+export function resetDemoData(): void {
+  DEMO_COMMUNITIES.length = 0;
+  INITIAL_COMMUNITIES.forEach((c) => DEMO_COMMUNITIES.push({ ...c }));
+  DEMO_TRIPS.length = 0;
+  INITIAL_TRIPS.forEach((t) => DEMO_TRIPS.push({ ...t }));
+}
+
+export const DEMO_PARTICIPANTS = [
+  { trip_id: 'trip-001', user_id: 'user-001', status: 'going', joined_at: '2026-09-15T10:00:00Z' },
+  { trip_id: 'trip-001', user_id: 'user-002', status: 'going', joined_at: '2026-09-16T10:00:00Z' },
+  { trip_id: 'trip-001', user_id: 'user-003', status: 'waitlisted', joined_at: '2026-09-18T10:00:00Z' },
+  { trip_id: 'trip-002', user_id: 'user-001', status: 'going', joined_at: '2026-09-18T10:00:00Z' },
+  { trip_id: 'trip-003', user_id: 'user-004', status: 'going', joined_at: '2026-09-20T10:00:00Z' },
 ];

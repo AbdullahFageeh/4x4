@@ -23,8 +23,7 @@ export function CommunitiesScreen({ navigation }: Props) {
   const { t } = useTranslation();
   const { isDark } = useAppStore();
   const theme = isDark ? darkTheme : lightTheme;
-  const { communities, isLoading, fetchCommunities, joinCommunity, userCommunities } =
-    useCommunityStore();
+  const { communities, ops, fetchCommunities, joinCommunity, userCommunities } = useCommunityStore();
   const [search, setSearch] = useState('');
   const [selectedModel, setSelectedModel] = useState<string | null>(null);
 
@@ -142,7 +141,7 @@ export function CommunitiesScreen({ navigation }: Props) {
   };
 
   const renderEmpty = () => {
-    if (isLoading) {
+    if (ops.fetchStatus === 'loading') {
       return (
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -155,7 +154,7 @@ export function CommunitiesScreen({ navigation }: Props) {
         <Text style={{ fontSize: 64 }}>🏜️</Text>
         <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>{t('common.empty')}</Text>
         <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>
-          {search ? 'لا توجد نتائج' : 'لا توجد مجتمعات حالياً'}
+          {search ? t('common.noResults') : t('community.title')}
         </Text>
       </View>
     );
@@ -177,7 +176,7 @@ export function CommunitiesScreen({ navigation }: Props) {
         ListEmptyComponent={renderEmpty}
         refreshControl={
           <RefreshControl
-            refreshing={isLoading}
+            refreshing={ops.fetchStatus === 'loading'}
             onRefresh={() => fetchCommunities({ search, car_model: selectedModel || undefined })}
           />
         }

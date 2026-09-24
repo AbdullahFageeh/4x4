@@ -24,7 +24,7 @@ export function TripsScreen({ navigation }: Props) {
   const { t } = useTranslation();
   const { isDark } = useAppStore();
   const theme = isDark ? darkTheme : lightTheme;
-  const { trips, isLoading, fetchTrips, joinTrip, userTrips } = useTripStore();
+  const { trips, ops, fetchTrips, joinTrip, userTrips } = useTripStore();
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -170,7 +170,7 @@ export function TripsScreen({ navigation }: Props) {
   };
 
   const renderEmpty = () => {
-    if (isLoading) {
+    if (ops.fetchStatus === 'loading') {
       return (
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
@@ -183,7 +183,7 @@ export function TripsScreen({ navigation }: Props) {
         <Text style={{ fontSize: 64 }}>🗺️</Text>
         <Text style={[styles.emptyTitle, { color: theme.colors.text }]}>{t('common.empty')}</Text>
         <Text style={[styles.emptyText, { color: theme.colors.textMuted }]}>
-          {search ? 'لا توجد نتائج' : 'لا توجد رحلات حالياً'}
+          {search ? t('common.noResults') : t('trip.title')}
         </Text>
       </View>
     );
@@ -205,7 +205,7 @@ export function TripsScreen({ navigation }: Props) {
         ListEmptyComponent={renderEmpty}
         refreshControl={
           <RefreshControl
-            refreshing={isLoading}
+            refreshing={ops.fetchStatus === 'loading'}
             onRefresh={() => fetchTrips({ search, category: selectedCategory as any })}
           />
         }

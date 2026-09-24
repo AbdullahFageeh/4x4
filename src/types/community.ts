@@ -41,3 +41,12 @@ export interface CommunityFilter {
   car_model?: string;
   location?: 'near_me' | 'all';
 }
+
+export type MembershipStatus = 'not_joined' | 'pending' | 'member';
+
+export interface CommunityOperationState {
+  fetchStatus: 'idle' | 'loading' | 'error';
+  createStatus: 'idle' | 'loading' | 'error';
+  joinStatus: 'idle' | 'loading' | 'success' | 'error';
+  leaveStatus: 'idle' | 'loading' | 'success' | 'error';
+}
