@@ -2,7 +2,7 @@ import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import './src/i18n';
@@ -60,37 +60,88 @@ function OnboardingScreen() {
 }
 
 function SignInScreen() {
+  const { t } = useTranslation();
   const { isDark, setAuthenticated } = useAppStore();
   const theme = isDark ? darkTheme : lightTheme;
+  const [phone, setPhone] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const handleSignIn = async () => {
+    if (!phone || !password) {
+      setError(t('auth.phoneRequired'));
+      return;
+    }
+    setIsLoading(true);
+    setError(null);
+
+    const { signInWithPhone } = await import('./src/services/supabase');
+    const { data, error: signInError } = await signInWithPhone(phone, password);
+
+    setIsLoading(false);
+
+    if (signInError) {
+      setError(signInError.message);
+      return;
+    }
+
+    if (data?.user) {
+      setAuthenticated({
+        id: data.user.id,
+        name: data.user.user_metadata?.name || 'مستخدم',
+        avatarUrl: null,
+        phone: data.user.phone || phone,
+        preferredLanguage: 'ar',
+        carModel: '',
+        carDetails: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+    }
+  };
+
   return (
-    <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
+    <ScrollView style={[styles.center, { backgroundColor: theme.colors.background }]}>
       <Text style={{ fontSize: 64 }}>🔑</Text>
-      <Text style={[styles.title, { color: theme.colors.text }]}>تسجيل الدخول</Text>
-      <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>أدخل رقم الجوال للمتابعة</Text>
+      <Text style={[styles.title, { color: theme.colors.text }]}>{t('auth.signIn')}</Text>
+      <Text style={[styles.subtitle, { color: theme.colors.textMuted }]}>{t('auth.welcomeBack')}</Text>
       <View style={{ height: 40 }} />
-      <View style={[styles.button, { backgroundColor: theme.colors.primary }]}>
-        <Text
-          style={[styles.buttonText, { color: theme.colors.onPrimary }]}
-          onPress={() =>
-            setAuthenticated({
-              id: 'demo-user-001',
-              name: 'عبدالله',
-              avatarUrl: null,
-              phone: '+966500000000',
-              preferredLanguage: 'ar',
-              carModel: 'Toyota Land Cruiser 2022',
-              carDetails: { year: 2022, color: 'White', modifications: [] },
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            })
-          }>
-          متابعة كحساب تجريبي
+      <TextInput
+        style={[styles.input, { backgroundColor: theme.colors.surface, color: theme.colors.text, borderColor: theme.colors.border }]}
+        value={phone}
+        onChangeText={setPhone}
+        placeholder={t('auth.phone')}
+        placeholderTextColor={theme.colors.placeholder}
+        keyboardType="phone-pad"
+      />
+      <View style={{ height: 12 }} />
+      <TextInput
+        style={[styles.input, { backgroundColor: theme.colors.surface, color: theme.colors.text, borderColor: theme.colors.border }]}
+        value={password}
+        onChangeText={setPassword}
+        placeholder={t('auth.password')}
+        placeholderTextColor={theme.colors.placeholder}
+        secureTextEntry
+      />
+      {error && (
+        <Text style={[styles.errorText, { color: theme.colors.error }]}>{error}</Text>
+      )}
+      <View style={{ height: 20 }} />
+      <TouchableOpacity
+        onPress={handleSignIn}
+        disabled={isLoading}
+        style={[styles.button, { backgroundColor: isLoading ? theme.colors.disabled : theme.colors.primary }]}
+      >
+        <Text style={[styles.buttonText, { color: theme.colors.onPrimary }]}>
+          {isLoading ? t('common.loading') : t('auth.signIn')}
         </Text>
-      </View>
-      <Text style={[styles.demoLabel, { color: theme.colors.warning }]}>🎬 وضع التجربة</Text>
-    </View>
+      </TouchableOpacity>
+      <Text style={[styles.demoLabel, { color: theme.colors.warning }]}>🎬 {t('onboarding.demo')}</Text>
+    </ScrollView>
   );
 }
+
 
 function MainTabs() {
   const { isDark } = useAppStore();
@@ -184,6 +235,16 @@ const styles = StyleSheet.create({
   button: { paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, minWidth: 200, alignItems: 'center' },
   buttonText: { fontSize: 16, fontWeight: '600' },
   demoLabel: { fontSize: 14, fontWeight: '600', marginTop: 20 },
+  input: {
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    fontSize: 16,
+    minWidth: 200,
+    width: 280,
+  },
+  errorText: { fontSize: 14, marginTop: 8 },
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
