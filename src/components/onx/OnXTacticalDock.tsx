@@ -1,14 +1,4 @@
 import React from 'react';
-import {
-  MapPin,
-  Radio,
-  Ruler,
-  Square,
-  DownloadCloud,
-  Layers,
-  CircleDot,
-  Compass,
-} from 'lucide-react';
 
 interface OnXTacticalDockProps {
   activeTool: 'mark' | 'track' | 'measure' | 'area' | 'offline' | 'layers' | null;
@@ -23,94 +13,68 @@ export const OnXTacticalDock: React.FC<OnXTacticalDockProps> = ({
   isRecordingTrack,
   onOpenDrawerTab,
 }) => {
-  const tools = [
-    {
-      id: 'layers' as const,
-      label: 'الطبقات',
-      labelEn: 'Layers',
-      icon: Layers,
-      action: () => {
-        onOpenDrawerTab('layers');
-        setActiveTool(activeTool === 'layers' ? null : 'layers');
-      },
-      highlight: false,
-    },
-    {
-      id: 'mark' as const,
-      label: 'نقطة (Mark)',
-      labelEn: 'Mark Waypoint',
-      icon: MapPin,
-      action: () => setActiveTool(activeTool === 'mark' ? null : 'mark'),
-      highlight: true,
-    },
-    {
-      id: 'track' as const,
-      label: isRecordingTrack ? 'جاري التسجيل...' : 'تسجيل (Track)',
-      labelEn: isRecordingTrack ? 'Recording...' : 'Record Track',
-      icon: CircleDot,
-      action: () => setActiveTool(activeTool === 'track' ? null : 'track'),
-      highlight: isRecordingTrack,
-      isRecording: isRecordingTrack,
-    },
-    {
-      id: 'measure' as const,
-      label: 'قياس (Line)',
-      labelEn: 'Measure Line',
-      icon: Ruler,
-      action: () => setActiveTool(activeTool === 'measure' ? null : 'measure'),
-      highlight: false,
-    },
-    {
-      id: 'area' as const,
-      label: 'مساحة (Area)',
-      labelEn: 'Measure Area',
-      icon: Square,
-      action: () => setActiveTool(activeTool === 'area' ? null : 'area'),
-      highlight: false,
-    },
-    {
-      id: 'offline' as const,
-      label: 'بدون نت (Offline)',
-      labelEn: 'Offline Maps',
-      icon: DownloadCloud,
-      action: () => setActiveTool(activeTool === 'offline' ? null : 'offline'),
-      highlight: false,
-    },
-  ];
-
   return (
-    <div className="absolute bottom-5 inset-x-0 z-30 flex justify-center px-4 pointer-events-none">
-      <div className="pointer-events-auto flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2 rounded-2xl bg-[#0f141f]/95 border border-white/10 shadow-2xl backdrop-blur-xl max-w-full overflow-x-auto">
-        {tools.map((t) => {
-          const Icon = t.icon;
-          const isActive = activeTool === t.id || t.isRecording;
+    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
+      <div className="flex items-center gap-2 bg-[rgba(30,29,27,0.85)] backdrop-blur-[20px] p-2 rounded border border-[rgba(235,233,228,0.08)] shadow-2xl">
+        {/* Mark Button */}
+        <button
+          onClick={() => setActiveTool(activeTool === 'mark' ? null : 'mark')}
+          className={`px-4 py-2 font-mono text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+            activeTool === 'mark'
+              ? 'bg-[#D4AF37] text-[#151412] font-bold'
+              : 'bg-transparent border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#151412]'
+          }`}
+        >
+          Mark
+        </button>
 
-          return (
-            <button
-              key={t.id}
-              onClick={t.action}
-              className={`flex flex-col items-center justify-center min-w-[62px] sm:min-w-[76px] py-2 px-2 rounded-xl transition-all active:scale-95 group ${
-                isActive
-                  ? 'bg-[#ff6a00] text-black shadow-lg shadow-[#ff6a00]/30 font-bold'
-                  : 'hover:bg-white/5 text-slate-300 hover:text-white'
-              }`}
-            >
-              <div className="relative">
-                <Icon
-                  className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:scale-110 ${
-                    t.isRecording ? 'text-black animate-pulse' : ''
-                  }`}
-                />
-                {t.isRecording && (
-                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-red-600 animate-ping" />
-                )}
-              </div>
-              <span className="text-[10px] sm:text-[11px] font-semibold mt-1 tracking-tight whitespace-nowrap">
-                {t.label}
-              </span>
-            </button>
-          );
-        })}
+        {/* Track Button */}
+        <button
+          onClick={() => setActiveTool(activeTool === 'track' ? null : 'track')}
+          className={`px-4 py-2 font-mono text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+            isRecordingTrack || activeTool === 'track'
+              ? 'bg-[#D4AF37] text-[#151412] font-bold'
+              : 'bg-transparent border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#151412]'
+          }`}
+        >
+          {isRecordingTrack ? 'REC...' : 'Track'}
+        </button>
+
+        {/* Line Button */}
+        <button
+          onClick={() => setActiveTool(activeTool === 'measure' ? null : 'measure')}
+          className={`px-4 py-2 font-mono text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+            activeTool === 'measure'
+              ? 'bg-[#D4AF37] text-[#151412] font-bold'
+              : 'bg-transparent border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#151412]'
+          }`}
+        >
+          Line
+        </button>
+
+        {/* Area Button */}
+        <button
+          onClick={() => setActiveTool(activeTool === 'area' ? null : 'area')}
+          className={`px-4 py-2 font-mono text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+            activeTool === 'area'
+              ? 'bg-[#D4AF37] text-[#151412] font-bold'
+              : 'bg-transparent border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#151412]'
+          }`}
+        >
+          Area
+        </button>
+
+        {/* Offline Map Button (Emerald Styled) */}
+        <button
+          onClick={() => setActiveTool(activeTool === 'offline' ? null : 'offline')}
+          className={`px-4 py-2 font-mono text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+            activeTool === 'offline'
+              ? 'bg-[#10B981] text-[#151412] font-bold'
+              : 'bg-transparent border border-[#10B981] text-[#10B981] hover:bg-[#10B981] hover:text-[#151412]'
+          }`}
+        >
+          Offline Map
+        </button>
       </div>
     </div>
   );

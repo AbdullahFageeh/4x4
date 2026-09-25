@@ -3,23 +3,16 @@ import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
 import {
   OnXWaypoint,
   OnXTrack,
-  OnXBasemapType,
   OnXLayersState,
 } from '../../types';
 import { SAUDI_PUBLIC_RESERVES } from '../../data/onxData';
 import {
   Compass,
-  Layers,
-  ZoomIn,
-  ZoomOut,
-  Crosshair,
   Box,
   MapPin,
-  ExternalLink,
   HardDrive,
-  Wind,
   Navigation,
-  Mountain,
+  Search,
 } from 'lucide-react';
 
 interface OnXMapViewerProps {
@@ -34,57 +27,60 @@ interface OnXMapViewerProps {
   liveTrackPoints?: { lat: number; lng: number }[];
   centerCoordsHUD: { lat: number; lng: number; altM: number; bearingDeg: number };
   setCenterCoordsHUD: (coords: { lat: number; lng: number; altM: number; bearingDeg: number }) => void;
+  onSearchSubmit?: (e: React.FormEvent) => void;
+  searchQuery?: string;
+  setSearchQuery?: (q: string) => void;
 }
 
-// onX Dark Topo High-Contrast Tactical Basemap Styling
-const ONX_TACTICAL_MAP_STYLE: google.maps.MapTypeStyle[] = [
-  { elementType: 'geometry', stylers: [{ color: '#131821' }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: '#0c1017' }, { weight: 3 }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: '#cbd5e1' }] },
+// Dark obsidian luxury styling for Expedition Elite
+const EXPEDITION_ELITE_MAP_STYLE: google.maps.MapTypeStyle[] = [
+  { elementType: 'geometry', stylers: [{ color: '#151412' }] },
+  { elementType: 'labels.text.stroke', stylers: [{ color: '#100f0e' }, { weight: 3 }] },
+  { elementType: 'labels.text.fill', stylers: [{ color: '#EBE9E4' }] },
   {
     featureType: 'administrative.country',
     elementType: 'geometry.stroke',
-    stylers: [{ color: '#ff6a00' }, { weight: 1.5 }], // onX Signal Orange borders
+    stylers: [{ color: '#D4AF37' }, { weight: 1.5 }],
   },
   {
     featureType: 'administrative.province',
     elementType: 'geometry.stroke',
-    stylers: [{ color: '#334155' }, { weight: 1 }],
+    stylers: [{ color: '#383530' }, { weight: 1 }],
   },
   {
     featureType: 'landscape.natural.terrain',
     elementType: 'geometry',
-    stylers: [{ color: '#171f2c' }],
+    stylers: [{ color: '#1c1b18' }],
   },
   {
     featureType: 'poi.park',
     elementType: 'geometry',
-    stylers: [{ color: '#062016' }], // Deep forest green
+    stylers: [{ color: '#112217' }],
   },
   {
     featureType: 'road.highway',
     elementType: 'geometry',
-    stylers: [{ color: '#ff6a00' }], // onX Signal Orange highways
+    stylers: [{ color: '#D4AF37' }],
   },
   {
     featureType: 'road.highway',
     elementType: 'labels.text.fill',
-    stylers: [{ color: '#fed7aa' }],
+    stylers: [{ color: '#F3E5AB' }],
   },
   {
     featureType: 'road.arterial',
     elementType: 'geometry',
-    stylers: [{ color: '#27354a' }],
+    stylers: [{ color: '#2a2824' }],
   },
   {
     featureType: 'road.local',
     elementType: 'geometry',
-    stylers: [{ color: '#1a2332' }],
+    stylers: [{ color: '#1e1d1a' }],
   },
   {
     featureType: 'water',
     elementType: 'geometry',
-    stylers: [{ color: '#09101d' }],
+    stylers: [{ color: '#0d0f14' }],
   },
   {
     featureType: 'water',
@@ -105,6 +101,9 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
   liveTrackPoints = [],
   centerCoordsHUD,
   setCenterCoordsHUD,
+  onSearchSubmit,
+  searchQuery = '',
+  setSearchQuery,
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
@@ -136,12 +135,12 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
         const initialMapType =
           layersState.basemap === 'satellite_hybrid'
             ? 'hybrid'
-            : layersState.basemap === 'topo' || layersState.basemap === 'terrain_3d'
+            : layersState.basemap === 'topo'
             ? 'terrain'
             : 'roadmap';
 
         const map = new mapsLib.Map(mapRef.current, {
-          center: { lat: 24.7136, lng: 46.6753 }, // Riyadh
+          center: { lat: 24.7136, lng: 46.6753 },
           zoom: 7,
           mapTypeId: initialMapType,
           disableDefaultUI: true,
@@ -150,19 +149,17 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
           streetViewControl: false,
           fullscreenControl: false,
           tilt: is3DTilted ? 45 : 0,
-          backgroundColor: '#0c1017',
-          styles: layersState.basemap === 'tactical_dark' ? ONX_TACTICAL_MAP_STYLE : [],
+          backgroundColor: '#151412',
+          styles: layersState.basemap === 'tactical_dark' ? EXPEDITION_ELITE_MAP_STYLE : [],
         });
 
         mapInstanceRef.current = map;
 
-        // Map movement listeners to update tactical HUD coordinates
         map.addListener('center_changed', () => {
           const c = map.getCenter();
           if (c) {
             const lat = c.lat();
             const lng = c.lng();
-            // Approximated altitude from terrain elevation (mock calc or real)
             const altM = Math.round(520 + Math.sin(lat * 10) * 240 + Math.cos(lng * 10) * 180);
             setCenterCoordsHUD({
               lat: Number(lat.toFixed(5)),
@@ -180,7 +177,7 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
         setIsLoading(false);
       })
       .catch((err) => {
-        console.error('onX Google Maps load error:', err);
+        console.error('Google Maps load error:', err);
         if (isMounted) setIsLoading(false);
       });
 
@@ -200,14 +197,9 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
     } else if (layersState.basemap === 'topo') {
       map.setMapTypeId('terrain');
       map.setOptions({ styles: [] });
-    } else if (layersState.basemap === 'terrain_3d') {
-      map.setMapTypeId('hybrid');
-      map.setTilt(45);
-      map.setOptions({ styles: [] });
     } else {
-      // Tactical Dark
       map.setMapTypeId('roadmap');
-      map.setOptions({ styles: ONX_TACTICAL_MAP_STYLE });
+      map.setOptions({ styles: EXPEDITION_ELITE_MAP_STYLE });
     }
   }, [layersState.basemap]);
 
@@ -216,7 +208,6 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
     const map = mapInstanceRef.current;
     if (!map || typeof google === 'undefined') return;
 
-    // Clear old markers
     Object.values(waypointMarkersRef.current).forEach((m) => m.setMap(null));
     waypointMarkersRef.current = {};
 
@@ -224,17 +215,17 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
 
     waypoints.forEach((wp) => {
       const isSelected = selectedWaypoint?.id === wp.id;
+      const markerColor = wp.color || '#D4AF37';
 
-      // onX Signature Pin Icon (SVG Pin with Category Glyph)
       const pinSvg = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="46" viewBox="0 0 36 46">
-          <filter id="shadow" x="-20%" y="-10%" width="140%" height="130%">
-            <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity="0.6"/>
+        <svg xmlns="http://www.w3.org/2000/svg" width="34" height="44" viewBox="0 0 34 44">
+          <filter id="goldGlow" x="-20%" y="-10%" width="140%" height="130%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.8"/>
           </filter>
-          <path d="M18 0 C8.06 0 0 8.06 0 18 C0 31.5 18 46 18 46 C18 46 36 31.5 36 18 C36 8.06 27.94 0 18 0 Z"
-            fill="${wp.color}" stroke="${isSelected ? '#ffffff' : '#0c1017'}" stroke-width="${isSelected ? '3' : '1.5'}" filter="url(#shadow)" />
-          <circle cx="18" cy="18" r="10" fill="#12161f" />
-          <circle cx="18" cy="18" r="4" fill="${wp.color}" />
+          <path d="M17 0 C7.6 0 0 7.6 0 17 C0 29.8 17 44 17 44 C17 44 34 29.8 34 17 C34 7.6 26.4 0 17 0 Z"
+            fill="${markerColor}" stroke="${isSelected ? '#FFFFFF' : '#151412'}" stroke-width="${isSelected ? '2.5' : '1.5'}" filter="url(#goldGlow)" />
+          <circle cx="17" cy="17" r="9" fill="#151412" />
+          <circle cx="17" cy="17" r="3.5" fill="${markerColor}" />
         </svg>
       `;
 
@@ -244,8 +235,8 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
         title: wp.name,
         icon: {
           url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(pinSvg)}`,
-          scaledSize: new google.maps.Size(isSelected ? 42 : 34, isSelected ? 52 : 44),
-          anchor: new google.maps.Point(18, 44),
+          scaledSize: new google.maps.Size(isSelected ? 38 : 30, isSelected ? 48 : 40),
+          anchor: new google.maps.Point(17, 40),
         },
       });
 
@@ -272,14 +263,13 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
       const line = new google.maps.Polyline({
         path: track.points.map((pt) => ({ lat: pt.lat, lng: pt.lng })),
         geodesic: true,
-        strokeColor: track.color || '#ff6a00',
+        strokeColor: track.color || '#D4AF37',
         strokeOpacity: 0.9,
-        strokeWeight: 4,
+        strokeWeight: 3.5,
         map,
       });
 
       line.addListener('click', () => {
-        // center map on track start
         if (track.points.length > 0) {
           map.panTo({ lat: track.points[0].lat, lng: track.points[0].lng });
         }
@@ -298,16 +288,15 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
       liveTrackPolylineRef.current = new google.maps.Polyline({
         path: [],
         geodesic: true,
-        strokeColor: '#ef4444', // Red recording stroke
+        strokeColor: '#10B981',
         strokeOpacity: 1.0,
-        strokeWeight: 5,
+        strokeWeight: 4,
         map,
       });
     }
 
     if (isRecording && liveTrackPoints.length > 0) {
       liveTrackPolylineRef.current.setPath(liveTrackPoints);
-      // Pan to latest point
       const latest = liveTrackPoints[liveTrackPoints.length - 1];
       map.panTo(latest);
     } else if (!isRecording) {
@@ -326,7 +315,6 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
     if (!layersState.showPublicReserves) return;
 
     SAUDI_PUBLIC_RESERVES.forEach((res) => {
-      // Draw simulated reserve boundary polygon around center
       const d = 0.55;
       const coords = [
         { lat: res.center.lat + d, lng: res.center.lng - d },
@@ -339,9 +327,9 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
         paths: coords,
         strokeColor: res.color,
         strokeOpacity: 0.85,
-        strokeWeight: 2,
+        strokeWeight: 1.5,
         fillColor: res.color,
-        fillOpacity: 0.12,
+        fillOpacity: 0.1,
         map,
       });
 
@@ -349,7 +337,6 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
     });
   }, [layersState.showPublicReserves]);
 
-  // Controls Handlers
   const handleZoomIn = () => {
     const map = mapInstanceRef.current;
     if (map) map.setZoom((map.getZoom() || 7) + 1);
@@ -376,145 +363,144 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
     map.setTilt(nextTilt ? 45 : 0);
   };
 
-  const handleLocateMe = () => {
-    if (navigator.geolocation && mapInstanceRef.current) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          mapInstanceRef.current?.panTo({ lat, lng });
-          mapInstanceRef.current?.setZoom(12);
-        },
-        () => {
-          // Default to Riyadh center if blocked
-          mapInstanceRef.current?.panTo({ lat: 24.7136, lng: 46.6753 });
-        }
-      );
-    }
-  };
-
   return (
-    <div className="relative w-full h-full overflow-hidden bg-[#0a0d13]">
-      {/* Map Container Element */}
+    <div className="relative w-full h-full overflow-hidden bg-[#151412]">
+      {/* Map Element Container */}
       <div ref={mapRef} className="w-full h-full min-h-[500px]" />
+
+      {/* Map Vignette Overlay (Variation 6) */}
+      <div className="map-overlay-vignette" />
 
       {/* Loading Overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-[#090d14]/90 z-20 flex flex-col items-center justify-center gap-3">
-          <div className="w-10 h-10 border-3 border-[#ff6a00]/30 border-t-[#ff6a00] rounded-full animate-spin" />
-          <span className="text-xs font-mono text-slate-300">
-            جاري تهيئة منصة خرائط onX Tactical التضاريسية...
+        <div className="absolute inset-0 bg-[#151412]/95 z-20 flex flex-col items-center justify-center gap-3">
+          <div className="w-8 h-8 border-2 border-[#D4AF37]/30 border-t-[#D4AF37] rounded-full animate-spin" />
+          <span className="font-mono text-xs text-[#EBE9E4]/60">
+            LOADING EXPEDITION CARTOGRAPHY...
           </span>
         </div>
       )}
 
-      {/* Center Reticle (Crosshair) */}
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-10">
-        <div className="relative w-8 h-8 flex items-center justify-center">
-          <div className="w-4 h-4 border-2 border-[#ff6a00] rounded-full opacity-70" />
-          <div className="absolute w-8 h-[1px] bg-[#ff6a00] opacity-50" />
-          <div className="absolute h-8 w-[1px] bg-[#ff6a00] opacity-50" />
+      {/* Centered Search Pill (Variation 6: .search-pill) */}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 w-[90%] sm:w-[500px] pointer-events-auto">
+        <form
+          onSubmit={onSearchSubmit}
+          className="flex items-center gap-3 px-6 py-2.5 rounded-full bg-[rgba(30,29,27,0.85)] backdrop-blur-[20px] border border-[rgba(235,233,228,0.12)] shadow-2xl transition-all focus-within:border-[#D4AF37]"
+        >
+          <Search className="w-4 h-4 text-[#EBE9E4]/50 shrink-0" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
+            placeholder="البحث عن إحداثيات أو مواقع..."
+            className="flex-1 bg-transparent border-none text-[#EBE9E4] text-xs sm:text-sm placeholder:text-[#EBE9E4]/40 outline-none"
+          />
+        </form>
+      </div>
+
+      {/* Floating Stats Card (Variation 6: .floating-stats) */}
+      <div className="absolute top-6 left-6 z-20 hidden md:flex flex-col gap-3 p-4 rounded bg-[rgba(30,29,27,0.85)] backdrop-blur-[20px] border border-[rgba(235,233,228,0.08)] shadow-2xl min-w-[210px]">
+        <div>
+          <div className="font-mono text-[9px] uppercase tracking-widest text-[#EBE9E4]/50">
+            Coordinates
+          </div>
+          <div className="font-mono text-sm text-[#EBE9E4] font-bold mt-0.5">
+            {centerCoordsHUD.lat}° N, {centerCoordsHUD.lng}° E
+          </div>
+        </div>
+
+        <div>
+          <div className="font-mono text-[9px] uppercase tracking-widest text-[#EBE9E4]/50">
+            Elevation
+          </div>
+          <div className="font-mono text-sm text-[#EBE9E4] font-bold mt-0.5">
+            {centerCoordsHUD.altM} M
+          </div>
+        </div>
+
+        <div>
+          <div className="font-mono text-[9px] uppercase tracking-widest text-[#EBE9E4]/50">
+            Surface Wind
+          </div>
+          <div className="font-mono text-sm text-[#D4AF37] font-bold mt-0.5">
+            18 KM/H
+          </div>
         </div>
       </div>
 
-      {/* Right Floating onX Tactical HUD Bar */}
-      <div className="absolute top-20 right-4 z-20 flex flex-col items-center gap-2">
-        {/* Compass Rose */}
+      {/* Stacked Map Controls (Variation 6: .map-controls) */}
+      <div className="absolute bottom-20 left-6 z-20 flex flex-col gap-[1px]">
         <button
           onClick={handleResetNorth}
-          className="w-10 h-10 rounded-xl bg-[#121620]/90 hover:bg-[#1a202c] border border-white/10 text-white shadow-xl flex items-center justify-center backdrop-blur-md transition-all active:scale-95 group"
-          title="محاذاة الشمال (North)"
+          className="w-12 h-12 bg-[rgba(30,29,27,0.85)] hover:bg-[rgba(40,39,36,0.95)] backdrop-blur-[20px] border border-[rgba(235,233,228,0.08)] text-[#EBE9E4] font-mono font-bold text-xs flex items-center justify-center transition-colors cursor-pointer"
+          title="North Alignment"
         >
-          <div
-            className="transition-transform duration-300"
-            style={{ transform: `rotate(${-mapHeading}deg)` }}
-          >
-            <Compass className="w-5 h-5 text-[#ff6a00] group-hover:scale-110" />
+          <div style={{ transform: `rotate(${-mapHeading}deg)` }}>
+            <span className="text-[#D4AF37]">N</span>
           </div>
         </button>
 
-        {/* 3D Terrain Tilt Button */}
         <button
           onClick={handleToggle3D}
-          className={`w-10 h-10 rounded-xl border shadow-xl flex items-center justify-center backdrop-blur-md transition-all active:scale-95 font-bold text-xs font-mono ${
+          className={`w-12 h-12 backdrop-blur-[20px] border border-[rgba(235,233,228,0.08)] font-mono font-bold text-xs flex items-center justify-center transition-colors cursor-pointer ${
             is3DTilted
-              ? 'bg-[#ff6a00] text-black border-[#ff6a00]'
-              : 'bg-[#121620]/90 hover:bg-[#1a202c] border-white/10 text-white'
+              ? 'bg-[#D4AF37] text-[#151412]'
+              : 'bg-[rgba(30,29,27,0.85)] hover:bg-[rgba(40,39,36,0.95)] text-[#EBE9E4]'
           }`}
-          title="تبديل المنظور ثلاثي الأبعاد 3D Tilt"
+          title="3D Tilt View"
         >
-          <Box className="w-4 h-4" />
+          3D
         </button>
 
-        {/* Locate Me (GPS Crosshair) */}
         <button
-          onClick={handleLocateMe}
-          className="w-10 h-10 rounded-xl bg-[#121620]/90 hover:bg-[#1a202c] border border-white/10 text-[#ff6a00] shadow-xl flex items-center justify-center backdrop-blur-md transition-all active:scale-95"
-          title="تحديد موقعي GPS"
+          onClick={handleZoomIn}
+          className="w-12 h-12 bg-[rgba(30,29,27,0.85)] hover:bg-[rgba(40,39,36,0.95)] backdrop-blur-[20px] border border-[rgba(235,233,228,0.08)] text-[#EBE9E4] font-mono text-lg flex items-center justify-center transition-colors cursor-pointer"
+          title="Zoom In"
         >
-          <Crosshair className="w-5 h-5" />
+          +
         </button>
 
-        {/* Zoom In & Out */}
-        <div className="flex flex-col rounded-xl bg-[#121620]/90 border border-white/10 overflow-hidden shadow-xl backdrop-blur-md">
-          <button
-            onClick={handleZoomIn}
-            className="w-10 h-10 hover:bg-white/10 text-white flex items-center justify-center transition-colors border-b border-white/10"
-            title="تقريب (+)"
-          >
-            <ZoomIn className="w-4 h-4" />
-          </button>
-          <button
-            onClick={handleZoomOut}
-            className="w-10 h-10 hover:bg-white/10 text-white flex items-center justify-center transition-colors"
-            title="إبعاد (-)"
-          >
-            <ZoomOut className="w-4 h-4" />
-          </button>
-        </div>
+        <button
+          onClick={handleZoomOut}
+          className="w-12 h-12 bg-[rgba(30,29,27,0.85)] hover:bg-[rgba(40,39,36,0.95)] backdrop-blur-[20px] border border-[rgba(235,233,228,0.08)] text-[#EBE9E4] font-mono text-lg flex items-center justify-center transition-colors cursor-pointer"
+          title="Zoom Out"
+        >
+          -
+        </button>
       </div>
 
       {/* Selected Waypoint Detail Card Overlay */}
       {selectedWaypoint && (
-        <div className="absolute top-20 left-4 rtl:left-auto rtl:right-16 z-20 w-80 rounded-2xl bg-[#0f141e]/95 border border-[#ff6a00]/40 p-4 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-4">
+        <div className="absolute top-20 right-6 z-20 w-80 rounded bg-[rgba(30,29,27,0.92)] border border-[#D4AF37]/40 p-4 shadow-2xl backdrop-blur-xl animate-in fade-in">
           <div className="flex items-start justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: `${selectedWaypoint.color}25`, color: selectedWaypoint.color }}
-              >
-                <MapPin className="w-4 h-4" />
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-white line-clamp-1">
-                  {selectedWaypoint.name}
-                </h4>
-                <span className="text-[10px] text-slate-400 font-mono">
-                  {selectedWaypoint.lat.toFixed(4)}°N, {selectedWaypoint.lng.toFixed(4)}°E
-                </span>
-              </div>
+            <div>
+              <h4 className="font-serif text-lg font-bold text-[#EBE9E4] line-clamp-1">
+                {selectedWaypoint.name}
+              </h4>
+              <span className="font-mono text-[10px] text-[#EBE9E4]/60">
+                {selectedWaypoint.lat.toFixed(4)}°N, {selectedWaypoint.lng.toFixed(4)}°E
+              </span>
             </div>
             <button
               onClick={() => onSelectWaypoint(null)}
-              className="text-slate-400 hover:text-white p-1"
+              className="text-[#EBE9E4]/50 hover:text-white p-1"
             >
               ✕
             </button>
           </div>
 
-          <div className="my-3 p-2.5 rounded-xl bg-[#090d14] border border-white/5 space-y-1.5 text-[11px] font-mono">
-            <div className="flex items-center justify-between text-slate-300">
-              <span className="text-slate-400">الارتفاع عن البحر:</span>
-              <span className="text-[#ff6a00] font-bold">{selectedWaypoint.elevationM} م</span>
+          <div className="my-3 p-2.5 bg-black/40 border border-[rgba(235,233,228,0.06)] space-y-1 font-mono text-[11px]">
+            <div className="flex items-center justify-between text-[#EBE9E4]/70">
+              <span>الارتفاع:</span>
+              <span className="text-[#D4AF37] font-bold">{selectedWaypoint.elevationM} M</span>
             </div>
             {selectedWaypoint.notes && (
-              <p className="text-slate-300 text-xs font-sans leading-relaxed pt-1 border-t border-white/5">
+              <p className="text-[#EBE9E4]/80 text-xs font-sans pt-1 border-t border-[rgba(235,233,228,0.06)]">
                 {selectedWaypoint.notes}
               </p>
             )}
           </div>
 
-          {/* Actions */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
@@ -526,42 +512,23 @@ export const OnXMapViewer: React.FC<OnXMapViewerProps> = ({
                   mapInstanceRef.current.setZoom(14);
                 }
               }}
-              className="flex-1 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+              className="flex-1 py-1.5 bg-[rgba(255,255,255,0.06)] hover:bg-[rgba(255,255,255,0.12)] text-[#EBE9E4] font-mono text-[11px] uppercase transition-colors"
             >
-              <Navigation className="w-3.5 h-3.5 text-[#ff6a00]" />
-              <span>تقريب النقطة</span>
+              Pan To
             </button>
 
             {onSyncWaypointToDrive && (
               <button
                 onClick={() => onSyncWaypointToDrive(selectedWaypoint)}
-                className="py-1.5 px-3 rounded-lg bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border border-blue-500/30 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
-                title="مزامنة في Google Drive"
+                className="py-1.5 px-3 bg-transparent border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#151412] font-mono text-[11px] uppercase transition-colors"
+                title="مزامنة مع Google Drive"
               >
-                <HardDrive className="w-3.5 h-3.5 text-blue-400" />
-                <span>حفظ بـ Drive</span>
+                Drive Sync
               </button>
             )}
           </div>
         </div>
       )}
-
-      {/* Floating Center Drop Button (Fast Waypoint Drop) */}
-      <div className="absolute bottom-24 right-4 z-20">
-        <button
-          onClick={() => {
-            onDropWaypointAtCenter({
-              lat: centerCoordsHUD.lat,
-              lng: centerCoordsHUD.lng,
-            });
-          }}
-          className="px-3.5 py-2 rounded-xl bg-[#ff6a00] hover:bg-[#ff7b1a] text-black font-extrabold text-xs shadow-xl flex items-center gap-2 transition-all active:scale-95"
-          title="إسقاط نقطة إحداثية عند منتصف الخريطة"
-        >
-          <MapPin className="w-4 h-4" />
-          <span>تثبيت نقطة هنا</span>
-        </button>
-      </div>
     </div>
   );
 };

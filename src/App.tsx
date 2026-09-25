@@ -43,7 +43,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0d13] text-slate-100 flex flex-col font-sans selection:bg-emerald-500/30 selection:text-emerald-300">
+    <div className="min-h-screen bg-[#151412] text-[#EBE9E4] flex flex-col font-sans selection:bg-[#D4AF37]/30 selection:text-[#D4AF37]">
       {/* Top Header */}
       <TopBar />
 

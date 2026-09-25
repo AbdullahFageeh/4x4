@@ -229,6 +229,9 @@ export const OnXAppContainer: React.FC = () => {
           liveTrackPoints={liveTrackPoints}
           centerCoordsHUD={centerCoordsHUD}
           setCenterCoordsHUD={setCenterCoordsHUD}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          onSearchSubmit={handleSearchSubmit}
         />
 
         {/* onX Left Flyout Drawer */}
@@ -250,6 +253,7 @@ export const OnXAppContainer: React.FC = () => {
           onOpenGoogleDriveModal={() => setShowGoogleDriveModal(true)}
           onSyncWaypointToDrive={handleSyncWaypointToDrive}
           onSyncTrackToDrive={handleSyncTrackToDrive}
+          onDropWaypointAtCenter={() => handleOpenMarkModal()}
         />
 
         {/* Live Track Recording Telemetry Bar */}
