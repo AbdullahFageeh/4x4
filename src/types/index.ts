@@ -168,3 +168,72 @@ export interface CommunityActivity {
   };
 }
 
+export type OnXWaypointIcon =
+  | 'campsite'
+  | 'obstacle'
+  | 'dune'
+  | 'hazard'
+  | 'fuel'
+  | 'water'
+  | 'wildlife'
+  | 'recovery'
+  | 'viewpoint';
+
+export interface OnXWaypoint {
+  id: string;
+  name: string;
+  icon: OnXWaypointIcon;
+  color: string;
+  lat: number;
+  lng: number;
+  elevationM: number;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface OnXTrackPoint {
+  lat: number;
+  lng: number;
+  alt?: number;
+  timestamp: number;
+}
+
+export interface OnXTrack {
+  id: string;
+  name: string;
+  distanceKm: number;
+  durationSeconds: number;
+  avgSpeedKmh: number;
+  elevationGainM: number;
+  points: OnXTrackPoint[];
+  color: string;
+  createdAt: string;
+}
+
+export interface OnXOfflineArea {
+  id: string;
+  name: string;
+  region: string;
+  sizeMb: number;
+  resolution: 'standard' | 'high' | 'ultra';
+  bounds: {
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+  };
+  downloadedAt: string;
+}
+
+export type OnXBasemapType = 'satellite_hybrid' | 'topo' | 'tactical_dark' | 'terrain_3d';
+
+export interface OnXLayersState {
+  basemap: OnXBasemapType;
+  showPublicReserves: boolean;
+  showTrailDifficulty: boolean;
+  showActiveConvoys: boolean;
+  showWindVectors: boolean;
+  showWaypoints: boolean;
+  showRecordedTracks: boolean;
+}
+

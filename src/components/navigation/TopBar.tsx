@@ -122,12 +122,17 @@ export const TopBar: React.FC = () => {
             onClick={() => setCurrentTab('explore')}
             className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
               currentTab === 'explore'
-                ? 'bg-white/10 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                ? 'bg-[#ff6a00] text-black font-bold shadow-md shadow-[#ff6a00]/30'
+                : 'text-slate-300 hover:text-white hover:bg-white/5'
             }`}
           >
-            <MapPin className="w-4 h-4 text-sky-400" />
-            <span>الخريطة الحية</span>
+            <MapPin className="w-4 h-4 text-[#ff6a00] group-hover:text-black" />
+            <span className="flex items-center gap-1">
+              <span>onX الخريطة</span>
+              <span className="text-[10px] font-mono px-1 py-0.2 rounded bg-black/30 text-white font-bold">
+                4x4
+              </span>
+            </span>
           </button>
         </nav>
 

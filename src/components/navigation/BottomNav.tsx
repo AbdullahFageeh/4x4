@@ -9,7 +9,7 @@ export const BottomNav: React.FC = () => {
   const tabs: { id: MainTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
     { id: 'communities', label: 'المجتمعات', icon: Users },
     { id: 'trips', label: 'الرحلات', icon: Compass },
-    { id: 'explore', label: 'الخريطة', icon: MapPin },
+    { id: 'explore', label: 'onX 4x4', icon: MapPin },
     { id: 'profile', label: 'حسابي', icon: User },
   ];
 
