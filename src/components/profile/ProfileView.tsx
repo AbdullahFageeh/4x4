@@ -20,6 +20,7 @@ import {
   CheckCircle,
   Radio,
   Sparkles,
+  HardDrive,
 } from 'lucide-react';
 
 export const ProfileView: React.FC = () => {
@@ -37,6 +38,7 @@ export const ProfileView: React.FC = () => {
     setCurrentTab,
     setShowOnboardingModal,
     setShowRadioConsoleModal,
+    setShowGoogleDriveModal,
   } = useApp();
 
   const [activeTab, setActiveTab] = useState<'garage' | 'communities' | 'trips' | 'settings'>('garage');
@@ -129,6 +131,15 @@ export const ProfileView: React.FC = () => {
             >
               <Radio className="w-3.5 h-3.5" />
               <span>جهاز اللاسلكي</span>
+            </button>
+
+            <button
+              onClick={() => setShowGoogleDriveModal(true)}
+              className="px-3.5 py-2.5 rounded-xl bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/40 text-blue-300 font-semibold text-xs shadow-md transition-all flex items-center justify-center gap-1.5 active:scale-95"
+              title="سحابة Google Drive لحفظ وتصدير ملفات الكراج والمسارات"
+            >
+              <HardDrive className="w-3.5 h-3.5 text-blue-400" />
+              <span>سحابة Drive</span>
             </button>
 
             <button

@@ -11,6 +11,7 @@ import {
   Zap,
   Radio,
   Sparkles,
+  HardDrive,
 } from 'lucide-react';
 
 export const TopBar: React.FC = () => {
@@ -29,6 +30,7 @@ export const TopBar: React.FC = () => {
     setShowNotificationsDrawer,
     setShowOnboardingModal,
     setShowRadioConsoleModal,
+    setShowGoogleDriveModal,
   } = useApp();
 
   const cities = ['الرياض', 'جدة', 'الخبر', 'أبها', 'الدرعية'];
@@ -77,6 +79,16 @@ export const TopBar: React.FC = () => {
           >
             <Radio className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
             <span>رادار اللاسلكي: UHF 462.56</span>
+          </button>
+
+          {/* Interactive Fast Action: Google Drive Storage */}
+          <button
+            onClick={() => setShowGoogleDriveModal(true)}
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 text-xs font-semibold transition-all"
+            title="سحابة Google Drive لحفظ ومزامنة المسارات والقوافل وبطاقة السائق"
+          >
+            <HardDrive className="w-3.5 h-3.5 text-blue-400" />
+            <span>Google Drive</span>
           </button>
         </div>
 

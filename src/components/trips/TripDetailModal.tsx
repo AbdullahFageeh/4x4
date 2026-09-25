@@ -16,6 +16,7 @@ import {
   Flag,
   Navigation,
   BarChart3,
+  HardDrive,
 } from 'lucide-react';
 
 interface TripDetailModalProps {
@@ -29,7 +30,7 @@ export const TripDetailModal: React.FC<TripDetailModalProps> = ({
   onClose,
   onToggleRegister,
 }) => {
-  const { voteOnTripPoll } = useApp();
+  const { voteOnTripPoll, setShowGoogleDriveModal, setActiveDriveTrip } = useApp();
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
       <div className="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[#0f141d] border border-white/10 shadow-2xl p-6 relative">
@@ -75,6 +76,18 @@ export const TripDetailModal: React.FC<TripDetailModalProps> = ({
                 <span>تأكيد التسجيل والانضمام للرتل</span>
               </>
             )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setActiveDriveTrip(trip);
+              setShowGoogleDriveModal(true);
+            }}
+            className="w-full mt-2 py-2.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-300 font-semibold text-xs transition-all flex items-center justify-center gap-2 active:scale-[0.99]"
+          >
+            <HardDrive className="w-4 h-4 text-blue-400" />
+            <span>حفظ ومزامنة بيانات وإحداثيات المسار في Google Drive</span>
           </button>
         </div>
 

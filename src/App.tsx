@@ -11,6 +11,7 @@ import { ProfileView } from './components/profile/ProfileView';
 import { NotificationsDrawer } from './components/notifications/NotificationsDrawer';
 import { InteractiveDriverOnboardingModal } from './components/onboarding/InteractiveDriverOnboardingModal';
 import { ConvoyRadioConsoleModal } from './components/telemetry/ConvoyRadioConsoleModal';
+import { GoogleDriveManagerModal } from './components/drive/GoogleDriveManagerModal';
 
 const AppContent: React.FC = () => {
   const {
@@ -22,6 +23,10 @@ const AppContent: React.FC = () => {
     setShowOnboardingModal,
     showRadioConsoleModal,
     setShowRadioConsoleModal,
+    showGoogleDriveModal,
+    setShowGoogleDriveModal,
+    activeDriveTrip,
+    setActiveDriveTrip,
     currentTab,
   } = useApp();
 
@@ -69,6 +74,17 @@ const AppContent: React.FC = () => {
       {showRadioConsoleModal && (
         <ConvoyRadioConsoleModal
           onClose={() => setShowRadioConsoleModal(false)}
+        />
+      )}
+
+      {/* Google Drive Trail & Convoy Cloud Storage Modal */}
+      {showGoogleDriveModal && (
+        <GoogleDriveManagerModal
+          onClose={() => {
+            setShowGoogleDriveModal(false);
+            setActiveDriveTrip(null);
+          }}
+          targetTripToSync={activeDriveTrip}
         />
       )}
 

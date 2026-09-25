@@ -41,6 +41,10 @@ interface AppContextType {
   setShowOnboardingModal: (val: boolean) => void;
   showRadioConsoleModal: boolean;
   setShowRadioConsoleModal: (val: boolean) => void;
+  showGoogleDriveModal: boolean;
+  setShowGoogleDriveModal: (val: boolean) => void;
+  activeDriveTrip: any | null;
+  setActiveDriveTrip: (trip: any | null) => void;
   selectedCity: string;
   setSelectedCity: (city: string) => void;
   theme: 'dark' | 'light';
@@ -98,6 +102,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [showNotificationsDrawer, setShowNotificationsDrawer] = useState<boolean>(false);
   const [showOnboardingModal, setShowOnboardingModal] = useState<boolean>(false);
   const [showRadioConsoleModal, setShowRadioConsoleModal] = useState<boolean>(false);
+  const [showGoogleDriveModal, setShowGoogleDriveModal] = useState<boolean>(false);
+  const [activeDriveTrip, setActiveDriveTrip] = useState<any | null>(null);
   const [selectedCity, setSelectedCity] = useState<string>('الرياض');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [activities, setActivities] = useState<CommunityActivity[]>(MOCK_COMMUNITY_ACTIVITIES);
@@ -492,6 +498,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setShowOnboardingModal,
         showRadioConsoleModal,
         setShowRadioConsoleModal,
+        showGoogleDriveModal,
+        setShowGoogleDriveModal,
+        activeDriveTrip,
+        setActiveDriveTrip,
         selectedCity,
         setSelectedCity,
         theme,
