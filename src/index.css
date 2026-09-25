@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'IBM Plex Sans Arabic', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+  :root {
+    --font-arabic: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-sans: 'Plus Jakarta Sans', var(--font-arabic);
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans Arabic', 'Plus Jakarta Sans', sans-serif;
+    background-color: #0a0d13;
+    color: #f1f5f9;
+    overflow-x: hidden;
+  }
+
+  /* Custom scrollbar for clean luxury automotive look */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0f131a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #262f3d;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #374355;
+  }
+}
+
+/* Subtle carbon / mesh texture helper */
+.bg-carbon {
+  background-color: #10141b;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 0);
+  background-size: 16px 16px;
+}
+
+.bg-topo {
+  background-color: #0d1117;
+  background-image: radial-gradient(ellipse at top right, rgba(16, 185, 129, 0.08), transparent 50%),
+                    radial-gradient(ellipse at bottom left, rgba(217, 119, 6, 0.06), transparent 50%);
+}
+

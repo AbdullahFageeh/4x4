@@ -1,0 +1,6 @@
+{
+  "name": "CarCom | مجتمع السيارات السعودي",
+  "description": "منصة مجتمعات السيارات الأولى في المملكة العربية السعودية: انضم إلى تجمعات وهواة السيارات، نظّم رحلات برية ومسارات أوف رود، وشارك شغفك.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
