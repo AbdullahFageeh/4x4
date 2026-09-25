@@ -1,17 +1,12 @@
 import React from 'react';
 import { Trip } from '../../types';
-import { CategoryIconBadge } from '../common/AutomotiveArt';
 import {
   Calendar,
   Clock,
   MapPin,
-  Users,
   Radio,
-  ArrowRight,
-  ArrowLeft,
   Check,
   Plus,
-  AlertCircle,
 } from 'lucide-react';
 
 interface TripCardProps {
@@ -25,73 +20,66 @@ export const TripCard: React.FC<TripCardProps> = ({
   trip,
   onSelect,
   onToggleRegister,
-  isRtl = true,
 }) => {
-  const difficultyBadge = {
-    easy: { text: 'مسار سهل', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' },
-    moderate: { text: 'تحدي متوسط', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20' },
-    expert: { text: 'مسار وعر للمحترفين', color: 'text-red-400 bg-red-500/10 border-red-500/20' },
-  }[trip.difficulty];
-
   const statusBadge = {
-    confirmed: { text: 'مؤكد الانطلاق', color: 'text-emerald-400' },
-    open: { text: 'باب التسجيل مفتوح', color: 'text-amber-400' },
+    confirmed: { text: 'مؤكد الانطلاق', color: 'text-[#10B981]' },
+    open: { text: 'باب التسجيل مفتوح', color: 'text-[#D4AF37]' },
     in_progress: { text: 'القافلة جارية الآن', color: 'text-sky-400' },
-    completed: { text: 'مكتملة', color: 'text-slate-400' },
+    completed: { text: 'مكتملة', color: 'text-[#EBE9E4]/40' },
   }[trip.status];
 
   return (
     <div
       onClick={() => onSelect(trip)}
-      className="group relative rounded-2xl bg-[#111722] hover:bg-[#151c2a] border border-white/10 hover:border-amber-500/30 transition-all duration-200 cursor-pointer overflow-hidden p-5 shadow-lg shadow-black/40 flex flex-col justify-between"
+      className="group relative flex flex-col justify-between bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(212,175,55,0.04)] border border-[rgba(235,233,228,0.08)] hover:border-[#D4AF37] transition-all duration-200 cursor-pointer overflow-hidden p-5 shadow-lg flex-1"
     >
       <div>
         {/* Top Header: Community & Status */}
         <div className="flex items-center justify-between gap-2 mb-3">
-          <span className="text-xs font-semibold text-emerald-400 truncate">
+          <span className="text-xs font-mono text-[#D4AF37] truncate uppercase tracking-wider">
             {trip.communityName}
           </span>
           <div className="flex items-center gap-1.5 text-[11px] font-mono font-medium">
-            <span className={`w-2 h-2 rounded-full ${trip.status === 'confirmed' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+            <span className={`w-2 h-2 rounded-full ${trip.status === 'confirmed' ? 'bg-[#10B981]' : 'bg-[#D4AF37]'}`} />
             <span className={statusBadge.color}>{statusBadge.text}</span>
           </div>
         </div>
 
         {/* Title */}
-        <h3 className="text-base font-bold text-white group-hover:text-amber-400 transition-colors line-clamp-1 mb-2">
+        <h3 className="font-serif text-lg font-bold text-[#EBE9E4] group-hover:text-[#D4AF37] transition-colors line-clamp-1 mb-2">
           {trip.title}
         </h3>
 
         {/* Itinerary Timeline Route Box */}
-        <div className="p-3 rounded-xl bg-[#0c1017] border border-white/5 space-y-2 mb-3.5">
-          <div className="flex items-center gap-2 text-xs">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
-            <span className="text-slate-400 text-[11px]">الانطلاق:</span>
-            <span className="text-slate-200 font-medium truncate">{trip.startLocation}</span>
+        <div className="p-3 bg-black/40 border border-[rgba(235,233,228,0.06)] space-y-1.5 mb-3.5 font-mono text-xs">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-[#10B981] shrink-0" />
+            <span className="text-[#EBE9E4]/50 text-[10px] uppercase">START:</span>
+            <span className="text-[#EBE9E4] truncate">{trip.startLocation}</span>
           </div>
-          <div className="flex items-center gap-2 text-xs">
-            <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shrink-0" />
-            <span className="text-slate-400 text-[11px]">الوجهة:</span>
-            <span className="text-slate-200 font-medium truncate">{trip.endLocation}</span>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0" />
+            <span className="text-[#EBE9E4]/50 text-[10px] uppercase">DEST:</span>
+            <span className="text-[#EBE9E4] truncate">{trip.endLocation}</span>
           </div>
         </div>
 
         {/* Unboxed Metadata (Zero-Pill Discipline) */}
-        <div className="grid grid-cols-2 gap-2 text-xs text-slate-400 font-mono mb-3.5">
+        <div className="grid grid-cols-2 gap-2 text-xs text-[#EBE9E4]/60 font-mono mb-3.5">
           <div className="flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <Calendar className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
             <span className="truncate">{trip.date}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <Clock className="w-3.5 h-3.5 text-[#EBE9E4]/40 shrink-0" />
             <span className="truncate">{trip.time}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <span className="tabular-nums font-bold text-white">{trip.distanceKm}</span> كم مسافة
+            <MapPin className="w-3.5 h-3.5 text-[#EBE9E4]/40 shrink-0" />
+            <span className="tabular-nums font-bold text-[#EBE9E4]">{trip.distanceKm}</span> KM
           </div>
           {trip.radioFrequency && (
-            <div className="flex items-center gap-1.5 text-emerald-400 truncate">
+            <div className="flex items-center gap-1.5 text-[#10B981] truncate">
               <Radio className="w-3.5 h-3.5 shrink-0" />
               <span className="truncate">{trip.radioFrequency.split(' ')[0]}</span>
             </div>
@@ -99,14 +87,14 @@ export const TripCard: React.FC<TripCardProps> = ({
         </div>
 
         {/* Vehicle Requirement Note */}
-        <div className="text-[11px] text-slate-400 leading-snug mb-3">
-          <span className="text-amber-400/90 font-medium">المركبة المطلوبة: </span>
+        <div className="text-[11px] text-[#EBE9E4]/60 leading-snug mb-3">
+          <span className="text-[#D4AF37] font-mono text-[10px] uppercase block">VEHICLE REQUIREMENT:</span>
           <span>{trip.vehicleRequirement}</span>
         </div>
       </div>
 
       {/* Footer Info & RSVP Action */}
-      <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-2">
+      <div className="pt-3 border-t border-[rgba(235,233,228,0.06)] flex items-center justify-between gap-2">
         {/* Participants Avatars */}
         <div className="flex items-center gap-2">
           <div className="flex -space-x-2 rtl:space-x-reverse">
@@ -116,34 +104,34 @@ export const TripCard: React.FC<TripCardProps> = ({
                 src={p.avatar}
                 alt={p.name}
                 referrerPolicy="no-referrer"
-                className="w-7 h-7 rounded-full object-cover border-2 border-[#111722]"
+                className="w-6 h-6 rounded-full object-cover border border-[#151412]"
                 title={`${p.name} (${p.vehicle})`}
               />
             ))}
           </div>
-          <span className="text-xs text-slate-400 font-mono">
-            <strong className="text-white font-bold tabular-nums">{trip.currentParticipants}</strong>/{trip.maxParticipants} سيارة
+          <span className="text-xs text-[#EBE9E4]/60 font-mono">
+            <strong className="text-[#EBE9E4] font-bold tabular-nums">{trip.currentParticipants}</strong>/{trip.maxParticipants} سيارة
           </span>
         </div>
 
         {/* RSVP Join Toggle Button */}
         <button
           onClick={(e) => onToggleRegister(trip.id, e)}
-          className={`min-h-[36px] px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 active:scale-95 shrink-0 ${
+          className={`min-h-[34px] px-3.5 py-1.5 text-xs font-mono uppercase tracking-wider transition-all flex items-center gap-1.5 active:scale-95 shrink-0 cursor-pointer ${
             trip.isRegistered
-              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30'
-              : 'bg-amber-500 hover:bg-amber-400 text-black font-bold shadow-md shadow-amber-950/40'
+              ? 'bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 hover:bg-[#10B981]/25'
+              : 'bg-[#D4AF37] hover:brightness-110 text-[#151412] font-bold shadow-sm'
           }`}
         >
           {trip.isRegistered ? (
             <>
               <Check className="w-3.5 h-3.5" />
-              <span>مؤكد الحضور</span>
+              <span>مشترك</span>
             </>
           ) : (
             <>
               <Plus className="w-3.5 h-3.5" />
-              <span>تسجيل بالقافلة</span>
+              <span>انضمام</span>
             </>
           )}
         </button>

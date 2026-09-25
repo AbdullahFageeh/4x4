@@ -1,7 +1,7 @@
 import React from 'react';
 import { Community, CommunityActivity } from '../../types';
 import { CategoryIconBadge } from '../common/AutomotiveArt';
-import { Users, Compass, MapPin, Check, Plus, ShieldCheck, Sparkles } from 'lucide-react';
+import { ShieldCheck, Plus, Check } from 'lucide-react';
 
 interface CommunityCardProps {
   community: Community;
@@ -19,7 +19,7 @@ export const CommunityCard: React.FC<CommunityCardProps> = ({
   return (
     <div
       onClick={() => onSelect(community)}
-      className="group relative flex flex-col justify-between rounded-2xl bg-[#111722] hover:bg-[#151c2a] border border-white/10 hover:border-emerald-500/30 transition-all duration-200 cursor-pointer overflow-hidden p-5 shadow-lg shadow-black/40"
+      className="group relative flex flex-col justify-between bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(212,175,55,0.04)] border border-[rgba(235,233,228,0.08)] hover:border-[#D4AF37] transition-all duration-200 cursor-pointer overflow-hidden p-5 shadow-lg flex-1"
     >
       {/* Top Banner & Category */}
       <div>
@@ -28,16 +28,16 @@ export const CommunityCard: React.FC<CommunityCardProps> = ({
             <CategoryIconBadge category={community.category} size="md" />
             <div>
               <div className="flex items-center gap-1.5">
-                <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors">
+                <h3 className="font-serif text-lg font-bold text-[#EBE9E4] group-hover:text-[#D4AF37] transition-colors">
                   {community.name}
                 </h3>
                 {community.isVerified && (
                   <span title="مجتمع مرخص وموثق" className="inline-flex">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <ShieldCheck className="w-4 h-4 text-[#10B981] shrink-0" />
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">
+              <p className="text-xs text-[#EBE9E4]/60 line-clamp-1 mt-0.5 font-sans">
                 {community.tagline}
               </p>
             </div>
@@ -45,49 +45,41 @@ export const CommunityCard: React.FC<CommunityCardProps> = ({
         </div>
 
         {/* Description snippet */}
-        <p className="text-xs text-slate-300/90 line-clamp-2 leading-relaxed mb-3">
+        <p className="text-xs text-[#EBE9E4]/70 line-clamp-2 leading-relaxed mb-3 font-sans">
           {community.description}
         </p>
 
         {/* Latest Activity Snippet */}
         {latestActivity && (
-          <div className="mb-3 px-2.5 py-1.5 rounded-lg bg-[#0c1017] border border-white/5 text-[11px] text-slate-300 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 animate-pulse" />
-            <span className="text-slate-400 shrink-0">آخر تحديث:</span>
-            <span className="truncate text-slate-200 font-medium">
+          <div className="mb-3 px-2.5 py-1.5 bg-black/40 border border-[rgba(235,233,228,0.06)] text-[11px] text-[#EBE9E4]/70 flex items-center gap-2 font-mono">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] shrink-0 animate-pulse" />
+            <span className="text-[#EBE9E4]/40 shrink-0">آخر نشاط:</span>
+            <span className="truncate text-[#EBE9E4] font-medium font-sans">
               {latestActivity.title || latestActivity.content}
             </span>
           </div>
         )}
       </div>
 
-      {/* Footer Info & Action */}
-      <div className="pt-3 border-t border-white/5 flex items-center justify-between gap-2">
-        {/* Unboxed Metadata (Zero-Pill Discipline) */}
-        <div className="flex items-center gap-2 text-xs text-slate-400 font-mono">
-          <span className="flex items-center gap-1 text-slate-300">
-            <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            <span>{community.city}</span>
+      {/* Footer Stats & Actions */}
+      <div className="pt-3 border-t border-[rgba(235,233,228,0.06)] flex items-center justify-between gap-2 font-mono text-xs">
+        <div className="flex items-center gap-3 text-[#EBE9E4]/50">
+          <span>
+            <strong className="text-[#EBE9E4] font-bold">{community.membersCount}</strong> عضو
           </span>
-          <span className="text-slate-600">·</span>
-          <span className="flex items-center gap-1">
-            <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <span className="tabular-nums font-semibold text-slate-200">{community.membersCount}</span> عضو
-          </span>
-          <span className="text-slate-600">·</span>
-          <span className="flex items-center gap-1">
-            <Compass className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <span className="tabular-nums font-semibold text-slate-200">{community.tripsCount}</span> قافلة
+          <span>·</span>
+          <span>
+            <strong className="text-[#EBE9E4] font-bold">{community.tripsCount}</strong> قافلة
           </span>
         </div>
 
-        {/* Join / Joined Toggle Action Button */}
+        {/* Join Button */}
         <button
           onClick={(e) => onToggleJoin(community.id, e)}
-          className={`min-h-[36px] px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 active:scale-95 shrink-0 ${
+          className={`min-h-[34px] px-3.5 py-1 text-xs font-mono uppercase tracking-wider transition-all flex items-center gap-1.5 active:scale-95 shrink-0 cursor-pointer ${
             community.isJoined
-              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30'
-              : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md shadow-emerald-950/40'
+              ? 'bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 hover:bg-[#10B981]/25'
+              : 'bg-transparent border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#151412]'
           }`}
         >
           {community.isJoined ? (

@@ -6,11 +6,7 @@ import {
   HardDrive,
   Trash2,
   CheckCircle2,
-  AlertCircle,
-  MapPin,
   X,
-  Layers,
-  Sparkles,
 } from 'lucide-react';
 
 interface OnXOfflineModalProps {
@@ -23,15 +19,15 @@ export const OnXOfflineModal: React.FC<OnXOfflineModalProps> = ({
   centerCoords,
 }) => {
   const [offlineAreas, setOfflineAreas] = useState<OnXOfflineArea[]>(INITIAL_OFFLINE_AREAS);
-  const [newAreaName, setNewAreaName] = useState<string>('منطقة الاستكشاف الحالية');
+  const [newAreaName, setNewAreaName] = useState<string>('قطاع الاستكشاف الميداني');
   const [resolution, setResolution] = useState<'standard' | 'high' | 'ultra'>('high');
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
   const [downloadProgress, setDownloadProgress] = useState<number>(0);
 
   const estimatedSizes = {
-    standard: 45, // MB
-    high: 125, // MB
-    ultra: 280, // MB
+    standard: 45,
+    high: 125,
+    ultra: 280,
   };
 
   const handleDownload = () => {
@@ -46,7 +42,7 @@ export const OnXOfflineModal: React.FC<OnXOfflineModalProps> = ({
 
           const newPack: OnXOfflineArea = {
             id: `off-${Date.now()}`,
-            name: newAreaName.trim() || 'خريطة صحراوية غير متصلة',
+            name: newAreaName.trim() || 'خريطة صحراوية أوفلاين',
             region: `إحداثيات ${centerCoords.lat.toFixed(2)}°N, ${centerCoords.lng.toFixed(2)}°E`,
             sizeMb: estimatedSizes[resolution],
             resolution,
@@ -74,53 +70,50 @@ export const OnXOfflineModal: React.FC<OnXOfflineModalProps> = ({
   const totalUsedMb = offlineAreas.reduce((acc, a) => acc + a.sizeMb, 0);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="w-full max-w-xl rounded-2xl bg-[#0f1420] border border-[#ff6a00]/40 p-6 shadow-2xl text-right rtl:text-right space-y-5 animate-in zoom-in-95">
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+      <div className="w-full max-w-xl bg-[#151412] border border-[rgba(235,233,228,0.12)] p-6 shadow-2xl text-right rtl:text-right space-y-5 animate-in zoom-in-95">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#ff6a00]/20 text-[#ff6a00] flex items-center justify-center">
-              <DownloadCloud className="w-5 h-5" />
+        <div className="flex items-center justify-between border-b border-[rgba(235,233,228,0.08)] pb-4">
+          <div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-[#EBE9E4]/50 mb-1">
+              Offline Cartography
             </div>
-            <div>
-              <h3 className="text-base font-bold text-white">الخرائط غير المتصلة (onX Offline Maps)</h3>
-              <p className="text-xs text-slate-400">
-                تحميل بلاطات الأقمار الصناعية وخطوط التضاريس للاستخدام بدون شبكة جوال
-              </p>
-            </div>
+            <h3 className="font-serif text-2xl text-[#EBE9E4]">حزم الخرائط غير المتصلة</h3>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white p-1">
+          <button onClick={onClose} className="text-[#EBE9E4]/50 hover:text-white p-1">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Offline Storage Status Bar */}
-        <div className="p-3.5 rounded-xl bg-[#080c14] border border-white/5 flex items-center justify-between text-xs font-mono">
-          <div className="flex items-center gap-2 text-slate-300">
-            <HardDrive className="w-4 h-4 text-[#ff6a00]" />
-            <span>المساحة المحملة أوفلاين:</span>
-            <span className="text-white font-bold">{totalUsedMb} MB</span>
+        {/* Status Bar */}
+        <div className="p-3 bg-[rgba(255,255,255,0.03)] border border-[rgba(235,233,228,0.08)] flex items-center justify-between text-xs font-mono">
+          <div className="flex items-center gap-2 text-[#EBE9E4]/70">
+            <HardDrive className="w-4 h-4 text-[#D4AF37]" />
+            <span>المساحة المحملة في الذاكرة:</span>
+            <span className="text-[#EBE9E4] font-bold">{totalUsedMb} MB</span>
           </div>
-          <span className="text-[11px] text-emerald-400">جاهزة للاستكشاف اللاسلكي</span>
+          <span className="text-[#10B981] font-semibold">جاهز للاستكشاف اللاسلكي</span>
         </div>
 
-        {/* Download New Region Card */}
-        <div className="p-4 rounded-xl bg-[#141b26] border border-white/5 space-y-3">
-          <span className="text-xs font-bold text-white block">حفظ القطاع الحالي (Center Tile)</span>
+        {/* Download New Region */}
+        <div className="p-4 bg-[rgba(255,255,255,0.02)] border border-[rgba(235,233,228,0.08)] space-y-3">
+          <span className="font-serif text-base font-bold text-[#EBE9E4] block">
+            تحميل القطاع الحالي (Sector Cache)
+          </span>
 
           <div>
-            <label className="text-[11px] text-slate-400 block mb-1">اسم المنطقة</label>
+            <label className="text-[11px] font-mono text-[#EBE9E4]/60 block mb-1">اسم الحزمة</label>
             <input
               type="text"
               value={newAreaName}
               onChange={(e) => setNewAreaName(e.target.value)}
-              placeholder="اسم المنطقة (مثال: طعوس بحرة، وادي الدواسر)"
-              className="w-full px-3 py-2 rounded-xl bg-[#090d14] border border-white/10 text-white text-xs focus:outline-none focus:border-[#ff6a00]"
+              placeholder="مثال: رمال بحرة، صحراء طويق"
+              className="w-full px-3 py-2 bg-[rgba(255,255,255,0.03)] border border-[rgba(235,233,228,0.1)] text-[#EBE9E4] text-xs focus:outline-none focus:border-[#D4AF37]"
             />
           </div>
 
           <div>
-            <label className="text-[11px] text-slate-400 block mb-1.5">دقة طبقات التضاريس</label>
+            <label className="text-[11px] font-mono text-[#EBE9E4]/60 block mb-1.5">دقة الطبقات</label>
             <div className="grid grid-cols-3 gap-2">
               {[
                 { id: 'standard', label: 'عادية (Standard)', size: '45 MB' },
@@ -131,29 +124,29 @@ export const OnXOfflineModal: React.FC<OnXOfflineModalProps> = ({
                   key={res.id}
                   type="button"
                   onClick={() => setResolution(res.id as any)}
-                  className={`p-2 rounded-xl border text-xs text-center transition-all ${
+                  className={`p-2 border text-xs text-center transition-all cursor-pointer ${
                     resolution === res.id
-                      ? 'bg-[#ff6a00]/20 border-[#ff6a00] text-white font-bold'
-                      : 'bg-[#090d14] border-white/5 text-slate-400'
+                      ? 'bg-[rgba(212,175,55,0.15)] border-[#D4AF37] text-[#D4AF37] font-bold'
+                      : 'bg-[rgba(255,255,255,0.02)] border-[rgba(235,233,228,0.08)] text-[#EBE9E4]/60'
                   }`}
                 >
-                  <span className="block font-semibold">{res.label}</span>
-                  <span className="block text-[10px] text-slate-400 font-mono mt-0.5">{res.size}</span>
+                  <span className="block font-sans text-xs">{res.label}</span>
+                  <span className="block text-[10px] font-mono opacity-60 mt-0.5">{res.size}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Progress bar if downloading */}
+          {/* Progress bar */}
           {isDownloading ? (
             <div className="space-y-1.5 pt-2">
-              <div className="flex items-center justify-between text-xs font-mono text-slate-300">
-                <span>جاري تحميل بلاطات الخريطة والتضاريس...</span>
-                <span className="text-[#ff6a00] font-bold">{downloadProgress}%</span>
+              <div className="flex items-center justify-between text-xs font-mono text-[#EBE9E4]/70">
+                <span>جاري حفظ البلاطات...</span>
+                <span className="text-[#D4AF37] font-bold">{downloadProgress}%</span>
               </div>
-              <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+              <div className="w-full h-1.5 bg-black/60 overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-[#ff6a00] to-amber-400 rounded-full transition-all duration-300"
+                  className="h-full bg-[#D4AF37] transition-all duration-300"
                   style={{ width: `${downloadProgress}%` }}
                 />
               </div>
@@ -161,28 +154,30 @@ export const OnXOfflineModal: React.FC<OnXOfflineModalProps> = ({
           ) : (
             <button
               onClick={handleDownload}
-              className="w-full py-2.5 rounded-xl bg-[#ff6a00] hover:bg-[#ff7b1a] text-black font-extrabold text-xs shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95"
+              className="w-full py-2.5 bg-[#D4AF37] hover:brightness-110 text-[#151412] font-serif font-bold text-sm tracking-wide transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
             >
               <DownloadCloud className="w-4 h-4" />
-              <span>بدء تحميل هذا القطاع للاستخدام بدون نت ({estimatedSizes[resolution]} MB)</span>
+              <span>تحميل القطاع ({estimatedSizes[resolution]} MB)</span>
             </button>
           )}
         </div>
 
-        {/* Existing Downloaded Areas List */}
+        {/* Existing Downloaded Areas */}
         <div className="space-y-2">
-          <span className="text-xs font-bold text-slate-400 block">المناطق المحملة مسبقاً في جهازك</span>
-          <div className="max-h-48 overflow-y-auto space-y-2 pr-1">
+          <span className="font-mono text-[10px] uppercase tracking-wider text-[#EBE9E4]/60 block">
+            الحزم المحفوظة ({offlineAreas.length})
+          </span>
+          <div className="max-h-40 overflow-y-auto space-y-2 pr-1">
             {offlineAreas.map((area) => (
               <div
                 key={area.id}
-                className="p-3 rounded-xl bg-[#090d14] border border-white/5 flex items-center justify-between gap-3 text-xs"
+                className="p-3 bg-[rgba(255,255,255,0.02)] border border-[rgba(235,233,228,0.06)] flex items-center justify-between gap-3 text-xs"
               >
                 <div className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-[#10B981] shrink-0" />
                   <div>
-                    <h5 className="font-semibold text-white">{area.name}</h5>
-                    <span className="text-[10px] text-slate-400 font-mono">
+                    <h5 className="font-semibold text-[#EBE9E4]">{area.name}</h5>
+                    <span className="text-[10px] text-[#EBE9E4]/50 font-mono">
                       {area.region} · {area.sizeMb} MB · دقة {area.resolution}
                     </span>
                   </div>
@@ -190,10 +185,10 @@ export const OnXOfflineModal: React.FC<OnXOfflineModalProps> = ({
 
                 <button
                   onClick={() => handleDeleteArea(area.id)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                  title="حذف المنطقة"
+                  className="p-1.5 text-[#EBE9E4]/40 hover:text-red-400 transition-colors"
+                  title="حذف"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             ))}
@@ -204,7 +199,7 @@ export const OnXOfflineModal: React.FC<OnXOfflineModalProps> = ({
         <div className="pt-2 flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold"
+            className="px-5 py-2 text-xs font-mono uppercase text-[#EBE9E4]/60 hover:text-white"
           >
             إغلاق
           </button>

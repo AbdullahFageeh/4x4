@@ -158,24 +158,24 @@ export const TripsView: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* 1. Header with Stats & Create Trip Action */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 rounded-2xl bg-[#111722] border border-white/10 shadow-xl">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 bg-[#151412] border border-[rgba(235,233,228,0.08)] shadow-2xl">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-bold text-white">
+          <div className="flex items-center gap-3">
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#EBE9E4]">
               قوافل ومسارات المملكة
             </h1>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono">
+            <span className="text-xs px-2.5 py-0.5 rounded bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30 font-mono">
               {trips.length} قافلة نشطة
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            رحلات برية منظمة، مسارات جبلية، وكروزات ساحلية مع أجهزة لاسلكية وبروتوكولات سلامة
+          <p className="text-xs text-[#EBE9E4]/60 mt-1 font-sans">
+            رحلات برية منظمة، مسارات جبلية، واستكشاف صحراوي مع أجهزة لاسلكية وبروتوكولات سلامة
           </p>
         </div>
 
         <button
           onClick={() => setShowCreateModal(true)}
-          className="min-h-[44px] px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-extrabold text-xs transition-all shadow-lg shadow-amber-950/40 flex items-center justify-center gap-2 active:scale-95"
+          className="min-h-[44px] px-6 py-2.5 bg-[#D4AF37] hover:brightness-110 text-[#151412] font-serif font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>تنظيم مسار جديد</span>
@@ -183,67 +183,67 @@ export const TripsView: React.FC = () => {
       </div>
 
       {/* 2. Interactive Map / Route Preview Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0c1219] via-[#101722] to-[#090d13] border border-white/10 p-5 shadow-2xl">
+      <div className="relative overflow-hidden bg-[rgba(255,255,255,0.02)] border border-[rgba(235,233,228,0.08)] p-6 shadow-2xl">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
           <div className="space-y-3 max-w-xl">
-            <div className="flex items-center gap-2 text-xs font-mono text-emerald-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <div className="flex items-center gap-2 text-xs font-mono text-[#10B981]">
+              <span className="w-2 h-2 rounded-full bg-[#10B981] animate-ping" />
               <span>خريطة القوافل والمسارات النشطة اليوم</span>
             </div>
-            <h2 className="text-lg sm:text-xl font-bold text-white">
+            <h2 className="font-serif text-xl sm:text-2xl font-bold text-[#EBE9E4]">
               مسار الأسبوع: خشم العان وحافة طويق الصخرية
             </h2>
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className="text-xs text-[#EBE9E4]/70 leading-relaxed font-sans">
               مسار متكامل يمتد 145 كم، نقطة التجمع عند مخرج صلبوخ، مع رتل مجهز بلاسلكي UHF وقائد مسار معتمد، ينتهي بمطل جبلي خيالي وعشاء شبة نار.
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400 font-mono pt-1">
-              <span className="flex items-center gap-1 text-slate-200">
-                <MapPin className="w-3.5 h-3.5 text-amber-400" />
+            <div className="flex flex-wrap items-center gap-3 text-xs text-[#EBE9E4]/50 font-mono pt-1">
+              <span className="flex items-center gap-1 text-[#EBE9E4]">
+                <MapPin className="w-3.5 h-3.5 text-[#D4AF37]" />
                 <span>الرياض · طويق</span>
               </span>
               <span>·</span>
-              <span className="flex items-center gap-1 text-slate-200">
-                <Navigation className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="flex items-center gap-1 text-[#EBE9E4]">
+                <Navigation className="w-3.5 h-3.5 text-[#10B981]" />
                 <span>145 كم</span>
               </span>
               <span>·</span>
-              <span className="text-amber-400">تردد اللاسلكي: UHF 462.5625 MHz</span>
+              <span className="text-[#D4AF37]">تردد اللاسلكي: UHF 462.5625 MHz</span>
             </div>
           </div>
 
           {/* Graphical Topographic Route Preview Card */}
-          <div className="w-full lg:w-96 rounded-xl bg-[#090d14] border border-white/10 p-3.5 relative overflow-hidden shadow-inner">
-            <div className="flex items-center justify-between text-xs text-slate-400 mb-2 font-mono">
-              <span className="text-emerald-400 font-bold">● مسار حي (Live Route)</span>
+          <div className="w-full lg:w-96 bg-[#151412] border border-[rgba(235,233,228,0.08)] p-4 relative overflow-hidden shadow-inner">
+            <div className="flex items-center justify-between text-xs text-[#EBE9E4]/50 mb-2 font-mono">
+              <span className="text-[#10B981] font-bold">● مسار حي (Live Route)</span>
               <span>GPS 24.7136° N, 46.6753° E</span>
             </div>
 
             {/* SVG Topographic Mini Map */}
-            <div className="relative w-full h-28 rounded-lg overflow-hidden bg-[#070b10] border border-white/5">
+            <div className="relative w-full h-28 overflow-hidden bg-black/40 border border-[rgba(235,233,228,0.06)]">
               <svg className="w-full h-full opacity-60" viewBox="0 0 300 120">
-                <path d="M10,80 Q60,30 120,60 T220,40 T290,70" fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeDasharray="5 3" />
-                <path d="M0,100 Q80,70 150,90 T300,75 L300,120 L0,120 Z" fill="rgba(16, 185, 129, 0.1)" />
-                <circle cx="10" cy="80" r="5" fill="#10b981" />
+                <path d="M10,80 Q60,30 120,60 T220,40 T290,70" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeDasharray="5 3" />
+                <path d="M0,100 Q80,70 150,90 T300,75 L300,120 L0,120 Z" fill="rgba(212, 175, 55, 0.1)" />
+                <circle cx="10" cy="80" r="5" fill="#10B981" />
                 <circle cx="120" cy="60" r="4" fill="#38bdf8" />
-                <circle cx="220" cy="40" r="4" fill="#f59e0b" />
+                <circle cx="220" cy="40" r="4" fill="#D4AF37" />
                 <circle cx="290" cy="70" r="6" fill="#ef4444" />
-                <text x="15" y="98" fill="#94a3b8" fontSize="10" fontFamily="monospace">انطلاق</text>
-                <text x="250" y="95" fill="#94a3b8" fontSize="10" fontFamily="monospace">القمة</text>
+                <text x="15" y="98" fill="#EBE9E4" opacity="0.6" fontSize="10" fontFamily="monospace">انطلاق</text>
+                <text x="250" y="95" fill="#EBE9E4" opacity="0.6" fontSize="10" fontFamily="monospace">القمة</text>
               </svg>
-              <div className="absolute bottom-1 right-2 rtl:right-auto rtl:left-2 text-[10px] text-slate-400 font-mono">
+              <div className="absolute bottom-1 right-2 rtl:right-auto rtl:left-2 text-[10px] text-[#EBE9E4]/50 font-mono">
                 صعود: +420م
               </div>
             </div>
 
-            <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5 text-[11px] text-slate-300">
+            <div className="flex items-center justify-between mt-2 pt-2 border-t border-[rgba(235,233,228,0.06)] text-[11px] text-[#EBE9E4]/80">
               <span>حالة الطريق: رمال جافة ومسار صخري</span>
               <button
                 onClick={() => {
                   const t = trips.find((x) => x.id === 'trip_01');
                   if (t) setSelectedTrip(t);
                 }}
-                className="text-amber-400 hover:underline font-semibold"
+                className="text-[#D4AF37] hover:underline font-semibold"
               >
                 عرض المسار الكامل ←
               </button>
@@ -257,36 +257,36 @@ export const TripsView: React.FC = () => {
         {/* Top Control Bar: Main Tabs & Reset Filters */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           {/* Main Tabs (Upcoming / Registered / Completed) */}
-          <div className="flex p-1 bg-[#111720] rounded-xl border border-white/5">
+          <div className="flex p-[2px] bg-[rgba(235,233,228,0.08)] border border-[rgba(235,233,228,0.08)]">
             <button
               onClick={() => setActiveTab('upcoming')}
-              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
+              className={`px-4 py-2 font-mono text-xs transition-colors cursor-pointer ${
                 activeTab === 'upcoming'
-                  ? 'bg-amber-500 text-black shadow-sm font-bold'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#D4AF37] text-[#151412] font-bold shadow-sm'
+                  : 'text-[#EBE9E4]/60 hover:text-white'
               }`}
             >
               جميع القوافل القادمة
             </button>
             <button
               onClick={() => setActiveTab('registered')}
-              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-2 font-mono text-xs transition-colors flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'registered'
-                  ? 'bg-amber-500 text-black shadow-sm font-bold'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#D4AF37] text-[#151412] font-bold shadow-sm'
+                  : 'text-[#EBE9E4]/60 hover:text-white'
               }`}
             >
               <span>رحلاتي المشترك بها</span>
-              <span className="w-4 h-4 rounded-full bg-white/20 text-[10px] flex items-center justify-center font-mono">
+              <span className="w-4 h-4 rounded-full bg-black/30 text-[10px] flex items-center justify-center font-mono">
                 {trips.filter((t) => t.isRegistered).length}
               </span>
             </button>
             <button
               onClick={() => setActiveTab('completed')}
-              className={`px-4 py-2 text-xs font-semibold rounded-lg transition-all ${
+              className={`px-4 py-2 font-mono text-xs transition-colors cursor-pointer ${
                 activeTab === 'completed'
-                  ? 'bg-amber-500 text-black shadow-sm font-bold'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-[#D4AF37] text-[#151412] font-bold shadow-sm'
+                  : 'text-[#EBE9E4]/60 hover:text-white'
               }`}
             >
               الرحلات المكتملة
@@ -297,7 +297,7 @@ export const TripsView: React.FC = () => {
           {hasActiveFilters && (
             <button
               onClick={handleResetFilters}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-amber-400 hover:text-amber-300 text-xs font-semibold border border-amber-500/20 transition-colors self-start sm:self-auto"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-transparent text-[#D4AF37] hover:bg-[#D4AF37]/10 font-mono text-xs font-semibold border border-[#D4AF37]/30 transition-colors self-start sm:self-auto cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>إعادة ضبط التصفية</span>
@@ -306,7 +306,7 @@ export const TripsView: React.FC = () => {
         </div>
 
         {/* Multi-Criteria Search Bar */}
-        <div className="relative rounded-2xl bg-[#111720] border border-white/10 p-2.5 sm:p-3 shadow-lg space-y-3">
+        <div className="relative bg-[#151412] border border-[rgba(235,233,228,0.08)] p-3 sm:p-4 shadow-lg space-y-3">
           {/* Main Search Input */}
           <div className="relative">
             <Search className="absolute right-3.5 rtl:right-3.5 rtl:left-auto left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-400 pointer-events-none" />

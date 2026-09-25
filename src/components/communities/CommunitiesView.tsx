@@ -67,31 +67,31 @@ export const CommunitiesView: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       {/* 1. Header Greeting & Welcome Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-[#121924] via-[#0f151f] to-[#0d1219] border border-white/10 shadow-xl">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 bg-[#151412] border border-[rgba(235,233,228,0.08)] shadow-2xl">
         <div className="flex items-center gap-3.5">
           <div className="relative">
             <img
               src={currentUser.avatar}
               alt={currentUser.name}
               referrerPolicy="no-referrer"
-              className="w-12 h-12 rounded-xl object-cover border-2 border-emerald-500/40"
+              className="w-12 h-12 rounded object-cover border border-[#D4AF37]"
             />
-            <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-[#121924]" />
+            <span className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-[#10B981] border border-[#151412]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-lg sm:text-xl font-bold text-white">
+              <h1 className="font-serif text-xl sm:text-2xl font-bold text-[#EBE9E4]">
                 مرحباً بك، {currentUser.name}
               </h1>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-medium">
+              <span className="text-xs px-2 py-0.5 bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/30 font-mono">
                 {currentUser.rankTitle}
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5 font-mono">
-              <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <p className="text-xs text-[#EBE9E4]/60 mt-0.5 flex items-center gap-1.5 font-mono">
+              <MapPin className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
               <span>{selectedCity}، المملكة العربية السعودية</span>
-              <span className="text-slate-600">·</span>
-              <span className="text-slate-300">{currentUser.garage[0]?.model || 'Land Cruiser 300'}</span>
+              <span>·</span>
+              <span>{currentUser.garage[0]?.model || 'Land Cruiser 300'}</span>
             </p>
           </div>
         </div>
@@ -100,7 +100,7 @@ export const CommunitiesView: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-all shadow-md shadow-emerald-950/40 flex items-center justify-center gap-2 active:scale-95"
+            className="w-full sm:w-auto px-5 py-2.5 bg-[#D4AF37] hover:brightness-110 text-[#151412] font-serif font-bold text-sm transition-all shadow-md flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>تأسيس مجتمع جديد</span>
@@ -182,12 +182,12 @@ export const CommunitiesView: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="ابحث عن مجتمع، نوع سيارة، أو مدينة (مثال: طويق، سوبركار، جدة)..."
-              className="w-full pr-10 pl-10 rtl:pr-10 rtl:pl-10 py-2.5 rounded-xl bg-[#111620] border border-white/10 text-white text-xs placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 transition-colors"
+              className="w-full pr-10 pl-10 rtl:pr-10 rtl:pl-10 py-2.5 bg-[rgba(255,255,255,0.03)] border border-[rgba(235,233,228,0.1)] text-[#EBE9E4] text-xs placeholder:text-[#EBE9E4]/40 focus:outline-none focus:border-[#D4AF37] transition-colors"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute left-3 rtl:left-3 rtl:right-auto top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white"
+                className="absolute left-3 rtl:left-3 rtl:right-auto top-1/2 -translate-y-1/2 p-1 text-[#EBE9E4]/50 hover:text-white"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -196,17 +196,17 @@ export const CommunitiesView: React.FC = () => {
         </div>
 
         {/* Category Filter Buttons (Interactive Segmented Discipline) */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex gap-[1px] p-[2px] bg-[rgba(235,233,228,0.08)] border border-[rgba(235,233,228,0.08)] overflow-x-auto scrollbar-none font-mono text-xs">
           {categories.map((cat) => {
             const isActive = selectedCategory === cat.id;
             return (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`whitespace-nowrap px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`whitespace-nowrap px-3.5 py-1.5 transition-colors cursor-pointer ${
                   isActive
-                    ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-950/40'
-                    : 'bg-[#111720] hover:bg-[#161d2a] text-slate-400 hover:text-slate-200 border border-white/5'
+                    ? 'bg-[#D4AF37] text-[#151412] font-bold'
+                    : 'text-[#EBE9E4]/60 hover:text-white'
                 }`}
               >
                 {cat.label}
