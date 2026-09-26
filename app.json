@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "CarCom",
-    "slug": "carcom-expo",
-    "version": "1.0.0",
+    "name": "Bronco Edition",
+    "slug": "carcom-bronco",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -14,7 +14,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.carcom.app",
+      "bundleIdentifier": "com.carcom.bronco",
       "config": {
         "googleMapsApiKey": "YOUR_IOS_GOOGLE_MAPS_API_KEY"
       }
@@ -24,7 +24,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.carcom.app",
+      "package": "com.carcom.bronco",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
@@ -50,8 +50,8 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Allow CarCom to use your location to show nearby communities and trips, and share live location during trips.",
-          "locationAlwaysAndWhenInUsePermission": "Allow CarCom to share your live location during trips even when the app is in the background.",
+          "locationWhenInUsePermission": "Allow Bronco Edition to use your location to show trips and share live location.",
+                  "locationAlwaysAndWhenInUsePermission": "Allow Bronco Edition to share your live location during trips even when the app is in the background.",
           "isIosBackgroundLocationEnabled": true,
           "isAndroidBackgroundLocationEnabled": true
         }
@@ -60,7 +60,7 @@
         "expo-notifications",
         {
           "icon": "./assets/notification-icon.png",
-          "color": "#1B5E20",
+          "color": "#C8440B",
           "mode": "production"
         }
       ],
@@ -72,7 +72,7 @@
         }
       ]
     ],
-    "scheme": "carcom",
+    "scheme": "bronco",
     "extra": {
       "router": { "origin": false }
     }
