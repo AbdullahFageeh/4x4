@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { storage } from '../store/useAppStore';
+import { createStorageAdapter } from './webStorage';
 import {
   UserRole,
   TripReview,
@@ -20,6 +20,8 @@ import {
   DEMO_SPONSORS,
 } from './demoData';
 import type { AuditLog, SupportTicket, Subscription, Sponsor, BroncoUser } from './types';
+
+const storage = createStorageAdapter();
 
 const mmkvStorage = {
   getItem: (name: string) => storage.getString(name) ?? null,
