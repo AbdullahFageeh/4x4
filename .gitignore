@@ -14,3 +14,6 @@ coverage/
 .env.local
 *.log
 .DS_Store
+
+# generated screenshots
+bronco-screenshot.png
