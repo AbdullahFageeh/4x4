@@ -33,12 +33,65 @@ const JS_DIRS = [
 const IMPORT_META_RE = /import\.meta\.env/g;
 const IMPORT_META_NEW = '({ MODE: "production" })';
 
-/** Locate the interop helper module by its body and capture its module id. */
-function findInteropModuleId(code) {
-  const re =
-    /__d\(function\([a-zA-Z_$][\w$]*,[a-zA-Z_$][\w$]*,[a-zA-Z_$][\w$]*,[a-zA-Z_$][\w$]*,[a-zA-Z_$][\w$]*,[a-zA-Z_$][\w$]*,[a-zA-Z_$][\w$]*\)\{Object\.defineProperty\([a-zA-Z_$][\w$]*,"__esModule",\{value:!0\}\),[a-zA-Z_$][\w$]*\.default=function\(e\)\{return e&&e\.__esModule\?e:\{default:e\}\}\},(\d+),\[\]\);/;
-  const m = code.match(re);
-  return m ? m[1] : null;
+/**
+ * Locate the interop helper module(s) by their body and capture their module ids.
+ *
+ * The serializer emits (at least) TWO distinct synthetic interop helpers, each a
+ * dependency-less factory `__d(fn, ID, []);` whose `default` export is the
+ * interop function itself (babel-generated):
+ *
+ *   - `interopRequireDefault`:
+ *       `ns.default=function(e){return e&&e.__esModule?e:{default:e}}`
+ *   - `asyncToGenerator` (what `import()`'s runtime helper resolves through):
+ *       `ns.default=function(e){return function(){var t=this,o=arguments;
+ *        return new Promise(function(r,u){var i=e.apply(t,o);function c(e){
+ *        n(i,r,u,c,f,"next",e)}function f(e){n(i,r,u,c,f,"throw",e)}
+ *        c(void 0)})}}`
+ *
+ * Both are namespaces `{__esModule:true, default: fn}`, and factories may
+ * *call* either of them. We identify them by testing each dep-less factory
+ * body for these signatures — matching the body, never a hardcoded module id,
+ * which shifts between builds with graph order.
+ *
+ * The async helper's body may begin with other local helpers (e.g. the
+ * regenerator step function) BEFORE the export statement, so the signature is
+ * tested anywhere in the body rather than anchored at its start.
+ *
+ * Real modules (e.g. a `forwardRef` component or `_assertThisInitialized`)
+ * also define `default` as a function, but their bodies do not contain these
+ * babel signatures, so they are excluded.
+ */
+function findInteropModuleIds(code) {
+  const ids = new Set();
+
+  // Every dependency-less factory: `__d(function(p1..p7){BODY},ID,[]);`
+  // The body is captured non-greedily up to the FIRST `},ID,[]);` boundary,
+  // which is safe because the two interop helpers (and the real dep-less
+  // modules we must reject) contain no nested `},<number>,[]);` sequence.
+  const factoryRe =
+    /__d\(function\([a-zA-Z_$][\w$]*,[a-zA-Z_$][\w$]*,[a-zA-Z_$][\w$]*,[a-zA-Z_$][\w$]*,[a-zA-Z_$][\w$]*,[a-zA-Z_$][\w$]*,[a-zA-Z_$][\w$]*\)\{([\s\S]*?)\},(\d+),\[\]\);/g;
+
+  // Name-tolerant signatures (minified single-letter names vary per build).
+  const syncSig =
+    /\.default=function\(\w+\)\{return \w+&&\w+\.__esModule\?\w+:\{default:\w+\}\}/;
+  // babel asyncToGenerator: a `default` export that returns a Promise wrapping
+  // the generator step calls. These tokens are unique to it among dep-less
+  // modules (real dep-less helpers like `_assertThisInitialized` have none).
+  const isAsyncSig = (body) =>
+    /\.default=function\(/.test(body) &&
+    body.includes('new Promise(') &&
+    body.includes(',"next",') &&
+    body.includes(',"throw",') &&
+    body.includes('(void 0)');
+
+  let m;
+  while ((m = factoryRe.exec(code)) !== null) {
+    const body = m[1];
+    if (syncSig.test(body) || isAsyncSig(body)) {
+      ids.add(m[2]);
+    }
+  }
+  return ids;
 }
 
 /**
@@ -48,8 +101,8 @@ function findInteropModuleId(code) {
  * The helper can appear at any dep index, not just 0.
  */
 function patchInvokedInterop(code) {
-  const interopId = findInteropModuleId(code);
-  if (interopId === null) return { code, count: 0, interopId };
+  const interopIds = findInteropModuleIds(code);
+  if (interopIds.size === 0) return { code, count: 0, interopIds: new Set() };
 
   // Dep maps come in two shapes depending on how the serializer emitted the
   // factory: an array `[1,2,3]` or a JSON object `{"0":1,"1":2}`. Both must be
@@ -78,7 +131,7 @@ function patchInvokedInterop(code) {
 
     const interopIndexes = [];
     depIds.forEach((id, i) => {
-      if (id === Number(interopId)) interopIndexes.push(i);
+      if (interopIds.has(String(id))) interopIndexes.push(i);
     });
     if (!interopIndexes.length) return match;
 
@@ -107,7 +160,7 @@ function patchInvokedInterop(code) {
     return match.replace(body, () => newBody);
   });
 
-  return { code: out, count, interopId };
+  return { code: out, count, interopIds };
 }
 
 function collect(dir) {
@@ -140,7 +193,7 @@ for (const dir of JS_DIRS) {
     const interop = patchInvokedInterop(next);
     if (interop.count > 0) {
       next = interop.code;
-      done.push(`interop x${interop.count} (module ${interop.interopId})`);
+      done.push(`interop x${interop.count} (modules ${[...interop.interopIds].join(',')})`);
     }
 
     const meta = (next.match(IMPORT_META_RE) || []).length;

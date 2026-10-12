@@ -49,6 +49,15 @@ export function TripMapScreen({ navigation, route }: Props) {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      {/* Header with back — sub-screens have no tab bar, so without this the
+          user is stranded on the map (no way back). */}
+      <View style={[styles.header, { backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.border }]}>
+        <TouchableOpacity onPress={navigation.goBack} style={styles.backButton}>
+          <Text style={[styles.backText, { color: theme.colors.primary }]}>←</Text>
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle, { color: theme.colors.text }]}>{t('trip.viewMap')}</Text>
+        <View style={{ width: 32 }} />
+      </View>
       <View style={[styles.mapContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border }]}>
         {googleMapsService.isConfigured ? (
           <MapView
@@ -182,6 +191,10 @@ export function TripMapScreen({ navigation, route }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: 1 },
+  backButton: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
+  backText: { fontSize: 20, fontWeight: '600' },
+  headerTitle: { flex: 1, fontSize: 16, fontWeight: '700' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   loadingText: { marginTop: 16 },
   errorText: { fontSize: 16, marginTop: 16 },

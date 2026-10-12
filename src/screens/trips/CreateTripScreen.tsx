@@ -87,7 +87,7 @@ export function CreateTripScreen({ navigation }: Props) {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={[styles.label, { color: theme.colors.text }]}>التصنيف</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>{t('trip.category')}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll}>
             {TRIP_CATEGORIES.map((cat) => (
               <TouchableOpacity
@@ -95,7 +95,7 @@ export function CreateTripScreen({ navigation }: Props) {
                 onPress={() => setCategory(cat.key)}
                 style={[styles.chip, { backgroundColor: category === cat.key ? theme.colors.primary : theme.colors.surface, borderColor: theme.colors.border }]}>
                 <Text style={[styles.chipText, { color: category === cat.key ? theme.colors.onPrimary : theme.colors.text }]}>
-                  {cat.emoji} {cat.label_ar}
+                  {cat.emoji} {t(`trip.categories.${cat.key}`)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -173,7 +173,7 @@ export function CreateTripScreen({ navigation }: Props) {
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={[styles.label, { color: theme.colors.text }]}>الجدول الزمني</Text>
+          <Text style={[styles.label, { color: theme.colors.text }]}>{t('trip.itinerary')}</Text>
           <TextInput
             style={[styles.textArea, { backgroundColor: theme.colors.surface, borderColor: theme.colors.border, color: theme.colors.text }]}
             value={itinerary}

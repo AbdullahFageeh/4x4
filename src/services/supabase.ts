@@ -12,18 +12,24 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    storage: {
-      getItem: (key: string) => SecureStore.getItemAsync(key),
-      setItem: (key: string, value: string) => SecureStore.setItemAsync(key, value),
-      removeItem: (key: string) => SecureStore.deleteItemAsync(key),
-    },
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
-  },
-});
+// Lazily / conditionally create the client. `createClient` throws when the URL
+// is empty, so we must NOT call it in demo mode (no EXPO_PUBLIC_SUPABASE_*).
+// Every `supabase.auth.*` call below is guarded by `isSupabaseConfigured()`,
+// so a null client is safe to hold and import in demo mode.
+export const supabase = supabaseUrl && supabaseAnonKey
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        storage: {
+          getItem: (key: string) => SecureStore.getItemAsync(key),
+          setItem: (key: string, value: string) => SecureStore.setItemAsync(key, value),
+          removeItem: (key: string) => SecureStore.deleteItemAsync(key),
+        },
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
+      },
+    })
+  : (null as unknown as ReturnType<typeof createClient>);
 
 // Check if Supabase is configured
 export const isSupabaseConfigured = () => {

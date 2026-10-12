@@ -8,6 +8,13 @@ import { useTranslation } from 'react-i18next';
 import './src/i18n';
 import { useAppStore } from './src/store/useAppStore';
 import { useBroncoStore } from './src/bronco/broncoStore';
+// Static import on purpose: on web, Metro code-splits dynamic imports into a
+// separate chunk, but the production web runtime has no chunk loader
+// (`__loadBundleAsync` is only registered under `__DEV__`), so
+// `import('./src/services/supabase')` would fail with "Requiring unknown
+// module". `supabase.ts` no longer throws at module scope in demo mode
+// (see its conditional `createClient`), so importing it statically is safe.
+import { signInWithPhone } from './src/services/supabase';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { broncoLight, broncoDark } from './src/bronco/theme';
 import { BroncoOnboarding } from './src/bronco/screens/BroncoOnboarding';
@@ -63,13 +70,46 @@ function SignInScreen() {
     setIsLoading(true);
     setError(null);
 
-    const { signInWithPhone } = await import('./src/services/supabase');
-    const { data, error: signInError } = await signInWithPhone(phone, password);
+    try {
+      const { data, error: signInError } = await signInWithPhone(phone, password);
 
-    setIsLoading(false);
+      setIsLoading(false);
 
-    if (signInError) {
-      // demo mode: allow any credentials
+      if (signInError) {
+        // demo mode: allow any credentials
+        const { setUserId } = useBroncoStore.getState();
+        setUserId('user-001');
+        setAuthenticated({
+          id: 'user-001',
+          name: 'عبدالله الفقي',
+          avatarUrl: null,
+          phone: phone || '+966501234567',
+          preferredLanguage: 'ar',
+          carModel: 'Ford Bronco Badlands',
+          carDetails: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
+        return;
+      }
+
+      if (data?.user) {
+        setAuthenticated({
+          id: data.user.id,
+          name: data.user.user_metadata?.name || 'مستخدم',
+          avatarUrl: null,
+          phone: data.user.phone || phone,
+          preferredLanguage: 'ar',
+          carModel: 'Ford Bronco',
+          carDetails: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
+      }
+    } catch (e) {
+      // Never leave the button stuck on "Loading..." — fall through to demo mode.
+      console.warn('signIn failed, falling back to demo mode', e);
+      setIsLoading(false);
       const { setUserId } = useBroncoStore.getState();
       setUserId('user-001');
       setAuthenticated({
@@ -79,21 +119,6 @@ function SignInScreen() {
         phone: phone || '+966501234567',
         preferredLanguage: 'ar',
         carModel: 'Ford Bronco Badlands',
-        carDetails: null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-      return;
-    }
-
-    if (data?.user) {
-      setAuthenticated({
-        id: data.user.id,
-        name: data.user.user_metadata?.name || 'مستخدم',
-        avatarUrl: null,
-        phone: data.user.phone || phone,
-        preferredLanguage: 'ar',
-        carModel: 'Ford Bronco',
         carDetails: null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -171,10 +196,26 @@ function BroncoMainTabs() {
       case 'ExternalServices': return <ExternalServicesScreen navigation={navigation} />;
       case 'CreateCommunity': return <CreateCommunityScreen navigation={navigation} />;
       case 'CommunityDetail': return <CommunityDetailScreen navigation={navigation} route={{ params }} />;
+      case 'CommunityChat':
+        // CommunityDetail navigates to 'CommunityChat' with `{ communityId }`.
+        // ChatScreen expects `{ channelType, channelId }`. Reuse the community
+        // channel of ChatScreen and normalize the param names.
+        return (
+          <ChatScreen
+            navigation={navigation}
+            route={{ params: { channelType: 'community', channelId: params?.communityId || 'comm-001' } }}
+          />
+        );
       case 'CreateTrip': return <CreateTripScreen navigation={navigation} />;
       case 'TripMap': return <TripMapScreen navigation={navigation} route={{ params }} />;
       case 'PlaceSearch': return <PlaceSearchScreen navigation={navigation} route={{ params }} />;
       case 'LiveLocation': return <LiveLocationScreen navigation={navigation} route={{ params }} />;
+      // The legacy ProfileScreen (still in the tree) navigates to 'Settings'.
+      // Route it to the Bronco settings screen so it isn't a dead end.
+      case 'Settings': return <SettingsScreen navigation={navigation} />;
+      // Settings menu links that don't have a dedicated screen yet.
+      case 'Help': return <PlaceholderScreen title="المساعدة" />;
+      case 'About': return <PlaceholderScreen title="عن التطبيق" />;
       default: return <PlaceholderScreen title={current} />;
     }
   }

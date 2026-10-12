@@ -96,7 +96,10 @@ export function BroncoTripsScreen({ navigation }: Props) {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.actionBtn, { backgroundColor: theme.colors.background, borderColor: theme.colors.border }]}
-                  onPress={() => navigation.navigate('TripMap', { id: t.id })}
+                  // TripMapScreen reads `route.params.tripId`, so pass it as
+                  // `tripId` (not `id`) or it renders an empty map / "loading"
+                  // forever.
+                  onPress={() => navigation.navigate('TripMap', { tripId: t.id })}
                 >
                   <Text style={[styles.actionText, { color: theme.colors.primary }]}>🗺️ الخريطة</Text>
                 </TouchableOpacity>

@@ -136,7 +136,13 @@ export function BroncoProfileScreen({ navigation }: Props) {
       {/* Info sections */}
       <SectionRow theme={theme} icon="🪪" title="الهوية" value={user.nationalId ?? '—'} />
       <SectionRow theme={theme} icon="🏘️" title="النقابة" value={user.club ?? 'غير مسجل'} onPress={() => navigation.navigate('BroncoCommunity')} />
-      <SectionRow theme={theme} icon="⭐" title="آخر تقييماتي" value={myReviews[0]?.comment.slice(0, 40) + '…' || 'لا توجد'} onPress={() => navigation.navigate('TripDetail', { id: 'trip-001' })} />
+      <SectionRow
+        theme={theme}
+        icon="⭐"
+        title="آخر تقييماتي"
+        value={myReviews[0]?.comment ? myReviews[0].comment.slice(0, 40) + '…' : 'لا توجد'}
+        onPress={() => navigation.navigate('TripDetail', { id: 'trip-001' })}
+      />
 
       <TouchableOpacity style={[styles.signOutBtn, { borderColor: theme.colors.error }]} onPress={signOut}>
         <Text style={[styles.signOutText, { color: theme.colors.error }]}>تسجيل الخروج</Text>

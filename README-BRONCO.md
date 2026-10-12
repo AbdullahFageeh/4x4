@@ -64,8 +64,29 @@ screenshot failure is ambiguous.
 node scripts/shoot-web.js   # screenshot + DOM dump (needs a Chromium binary)
 ```
 
-## Not yet verified
+## Web verification (2026-10-04, real browser, `npm run export:web` + `npx serve dist -l 8091`)
 
-- Only the onboarding screen has been rendered. The remaining client screens
-  and the admin panel have not been visually checked.
+Every screen was loaded and interacted with in a production web build
+(509 modules, 1.81 MB, `fix-web-bundle.js` applied; second scan clean):
+
+- Onboarding (language toggle, role select, finish) → sign-in (demo mode)
+- Trips list → trip detail (schedule, checklist, ratings, join) → voice-call
+  screen
+- Maps / offline-maps tab, Chat tab (messages, reactions, location pin),
+  Profile tab (identity, car, subscription)
+- SOS overlay (6 reason types, cancel)
+- Subscriptions (3 tiers, sponsors, demo notice)
+- Settings (Notifications / Privacy / Theme / Language / External Services /
+  Help / About) — i18n confirmed in both ar and en
+- Admin panel: all 8 sections (trips moderation, subscriptions + MRR,
+  pricing, admins, analytics, audit log, tickets, users)
+
+Zero console/page errors during a clean-load full tab tour.
+`npm run test:ci` (37/37), `tsc --noEmit`, and the web export all pass.
+Lint reports 5 pre-existing errors (3× `__dirname` in `scripts/*.js`,
+2× `react/no-unescaped-entities` in `AdminPanel.tsx`) — none introduced
+by the changes in this branch.
+
+## Still not verified
+
 - Native iOS/Android builds have not been run since the `react-dom` bump.
